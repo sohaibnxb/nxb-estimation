@@ -56,7 +56,7 @@ const deleteScreen = (req, res) => {
 
 const updateScreen = (req, res) => {
   Screen.findOneAndUpdate(
-    { projectId: req.body.projectId },
+    { projectId: req.body.project_id },
     { screens: req.body.screens },
     { new: true }
   )

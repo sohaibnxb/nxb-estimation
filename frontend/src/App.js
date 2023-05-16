@@ -6,6 +6,10 @@ import CreateEstimation from "./components/CreateEstimation";
 import Costing from "./components/Costing";
 import Languages from "./components/Languages";
 import Timeline from "./components/timeline";
+import PdfTemplate from "./components/PdfTemplate";
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 //css
 import "./index.scss";
 
@@ -32,7 +36,7 @@ function App() {
         <Route path="/costing" element={<Costing />}></Route>
         <Route path="/languages" element={<Languages />}></Route>
         <Route path="/timeline/:id" element={<Timeline />}></Route>
-        {/* <Route path="/newtimeline" element={<NewTimeline />}></Route> */}
+        <Route path="/pdftemplate" element={<PdfTemplate />}></Route>
         <Route path="*" element={<NotFoundpage />} />
       </Routes>
     </>

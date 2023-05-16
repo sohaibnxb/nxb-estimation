@@ -35,7 +35,7 @@ const Timelinecontent = () => {
   // delete rows
   const deleteTableRows = (index) => {
     const rows = [...rowsData];
-    rows.splice(index,1);
+    rows.splice(index, 1);
     setRowsData(rows);
   };
   //delete sub rows
@@ -61,45 +61,60 @@ const Timelinecontent = () => {
   };
   // screens added with estimates in screen schema
   async function addScreenNotify() {
-       console.log(rowsData, 'addScreenNotifyfunction');
-       if (rowsData) {
-         const projectEstimationExist = axios
-         .get(`http://localhost:5000/api/screens/screen/?projectId=${id}`)
-        .then((response) => {
-          console.log(response.data , 'id data');
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      if(projectEstimationExist == ""){
-      axios
-        .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
+    console.log(rowsData, 'addScreenNotifyfunction');
+    if (rowsData) {
+      // let projectEstimationExist;
+      // axios
+      //   .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
+      //   .then((response) => {
+      //     console.log('id data', response );
+      //     projectEstimationExist = response.data
+      //   })
+      //   .catch((error) => {
+      //     console.log("check projectEstimationExist",error);
+      //   });
+      // console.log("projectEstimationExist", projectEstimationExist);
+      const projectEstimation = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
         .then((response) => {
           console.log(response.data);
-          alert("New Screen created successfully");
-          
+          return response.data
         })
         .catch((error) => {
           console.log(error);
         });
+      console.log("projectEstimation", projectEstimation);
+      debugger
+      if (projectEstimation == "") {
+        await axios
+          .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
+          .then((response) => {
+            console.log(response.data);
+            alert("New Screen created successfully");
+
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         alert("if");
       }
       else {
-        axios
-        .put("http://localhost:5000/api/screens/id", {
-          project_id: id,
-          screens: rowsData,
-         })
-        .then((response) => {
-          console.log(response.data);
-          alert("Update screen estimation successfully");
-          
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        debugger
+        await axios
+          .put(`http://localhost:5000/api/screens/${id}`, {
+            project_id: id,
+            screens: rowsData,
+          })
+          .then((response) => {
+            console.log(response.data);
+            debugger
+            alert("Update screen estimation successfully");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         alert("else");
       }
+      debugger
       // Notification send it to manager
       var key = localStorage.getItem("username");
       var projKey = localStorage.getItem("projName");
@@ -111,11 +126,12 @@ const Timelinecontent = () => {
         .then((res) => {
           console.log(res.data);
           alert("Notification sent successfully to your manager");
-          
+
         })
         .catch((error) => {
           console.log(error);
         });
+      debugger
       //receiptant read notification
       const projN = localStorage.getItem("projName");
       axios
@@ -128,7 +144,7 @@ const Timelinecontent = () => {
         .catch((error) => {
           console.log(error);
         });
-
+      debugger
       // project status change
       axios
         .put(`http://localhost:5000/api/projects/?_id=${id}`, {
@@ -144,14 +160,14 @@ const Timelinecontent = () => {
   }
   // screens added with estimates in screen schema and project status changed as draft
   function savedAsDraft() {
-   
+
     if (rowsData != "") {
       axios
         .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
         .then((response) => {
           console.log(response.data);
           alert("New Screen created successfully");
-          
+
         })
         .catch((error) => {
           console.log(error);
@@ -183,8 +199,8 @@ const Timelinecontent = () => {
   function navigatePage() {
     console.log('navigate hours', totalHours)
     if (rowsData != "") {
-      return navigate("/costing",  { state: totalHours });
-      
+      return navigate("/costing", { state: totalHours });
+
     } else {
       alert("please fill the estimate");
     }
@@ -207,19 +223,19 @@ const Timelinecontent = () => {
         console.log(error);
       });
     // if timeline is already done then import data
-    const data =  axios
+    const data = axios
       .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
       .then((response) => {
         console.log(response.data);
-        if(response.data.screens?.length > 0) {
-         setRowsData(response.data.screens);
+        if (response.data.screens?.length > 0) {
+          setRowsData(response.data.screens);
         }
-    
+
       })
       .catch((error) => {
         console.log(error);
       });
-    
+
   }, [id]);
 
   return (
@@ -240,8 +256,8 @@ const Timelinecontent = () => {
                     <tr>
                       {Array.isArray(projDetails)
                         ? projDetails.map((elem, index) => {
-                            return <th key={elem._id}> {elem.proj_type} </th>;
-                          })
+                          return <th key={elem._id}> {elem.proj_type} </th>;
+                        })
                         : null}
                       <th>
                         <div className="assign-selectbox select-timeMode">
@@ -298,7 +314,7 @@ const Timelinecontent = () => {
                     </tbody>
                   ) : (
                     <tbody>
-                       <TableRows
+                      <TableRows
                         rowsData={rowsData}
                         rowsExtraData={rowsExtraData}
                         deleteTableRows={deleteTableRows}
@@ -331,20 +347,20 @@ const Timelinecontent = () => {
                   <ul className="expertise">
                     {Array.isArray(projDetails)
                       ? projDetails.map((elem, index) => {
-                          return (
-                            <li className="active" key={elem._id}>
-                              {elem.proj_name}
-                              <div className="action-btns">
-                                <span>
-                                  <i className="fas fa-edit"></i>
-                                </span>
-                                <span>
-                                  <i className="fas fa-times"></i>
-                                </span>
-                              </div>
-                            </li>
-                          );
-                        })
+                        return (
+                          <li className="active" key={elem._id}>
+                            {elem.proj_name}
+                            <div className="action-btns">
+                              <span>
+                                <i className="fas fa-edit"></i>
+                              </span>
+                              <span>
+                                <i className="fas fa-times"></i>
+                              </span>
+                            </div>
+                          </li>
+                        );
+                      })
                       : null}
                   </ul>
                   <div className="add-button">
@@ -402,6 +418,7 @@ const Timelinecontent = () => {
             <Button
               variant="contained"
               className="secondary-btn estimate-nav-btn"
+              onClick={() => navigate("/dashboard")}
             >
               Back
             </Button>

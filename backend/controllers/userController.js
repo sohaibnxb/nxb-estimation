@@ -69,11 +69,12 @@ const authUser = (req, res) => {
                 token: generateToken,
               });
             } else {
-              return res.status(404).json({ message: "User is not found" });
+              return res.status(404).json({ message: "Password is not valid" });
             }
           })
           .catch((err) => {
             console.log(err);
+            return res.status(404).json({ message: "Password is not valid" });
           });
       } else {
         return res.status(404).json({ message: "User is not found" });

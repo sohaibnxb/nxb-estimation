@@ -64,51 +64,51 @@ const Languages = () => {
         console.log(error);
       });
     console.log(message, 'message');
-     axios
-     .put("http://localhost:5000/api/projects/terms", {
-      proj_name: projName,
-      terms_conditions: message,
-     })
-     .then((response) => {
-       console.log(response.data);
-     })
-     .catch((error) => {
-       console.log(error);
-     });
+    axios
+      .put("http://localhost:5000/api/projects/terms", {
+        proj_name: projName,
+        terms_conditions: message,
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
   async function AddVteamTemp() {
     await addTagsAndTerms();
     var projName = localStorage.getItem("projName");
     // vteams template
     axios
-     .put("http://localhost:5000/api/projects/temp", {
-      proj_name: projName,
-      temp_id: vteam,
-     })
-     .then((response) => {
-       console.log(response.data);
-       navigate("/dashboard");
-     })
-     .catch((error) => {
-       console.log(error);
-     });
+      .put("http://localhost:5000/api/projects/temp", {
+        proj_name: projName,
+        temp_id: vteam,
+      })
+      .then((response) => {
+        console.log(response.data);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
   async function AddNxbTemp() {
     await addTagsAndTerms();
     var projName = localStorage.getItem("projName");
     // vteams template
     axios
-     .put("http://localhost:5000/api/projects/temp", {
-      proj_name: projName,
-      temp_id: nxb,
-     })
-     .then((response) => {
-       console.log(response.data);
-       navigate("/dashboard");
-     })
-     .catch((error) => {
-       console.log(error);
-     });
+      .put("http://localhost:5000/api/projects/temp", {
+        proj_name: projName,
+        temp_id: nxb,
+      })
+      .then((response) => {
+        console.log(response.data);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
   return (
     <>
@@ -160,13 +160,13 @@ const Languages = () => {
               className="imp-notes"
             >
               Estimate is prepared based on our understanding of tasks as listed
-              above. 
+              above.
               Any modification or addition in above task list will affect
-              time and cost as per scope. 
+              time and cost as per scope.
               Logo, Images, video and other content
-              will be provided by client. 
+              will be provided by client.
               We will use Bootstrap as our HTML/CSS
-              stan dards. 
+              stan dards.
               Markup will be compatible to all modern browsers, for
               internet explorer, version 12 and above will be supportive only
             </textarea>
@@ -210,6 +210,7 @@ const Languages = () => {
         </div>
       </form>
       <Footer />
+
     </>
   );
 };

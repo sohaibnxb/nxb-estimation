@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
+import { Link } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
+import { userData } from "./services";
 import SearchIcon from "../../../../assets/images/search.svg";
 import SelectIcon from "../../../../assets/images/select.svg";
-import { Link } from "react-router-dom";
 
 const EstimatesHistory = () => {
   const [projList, setProjList] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
- 
+
   const handleChange = async () => {
     var key = inputSearch;
     setIsLoading(true);
@@ -53,39 +54,44 @@ const EstimatesHistory = () => {
       console.log("no data");
     }
   };
-  const handleEditEstimate = async(_id) => {
+  const handleEditEstimate = async (_id) => {
     console.log(_id);
   }
+
   useEffect(() => {
-    setIsLoading(true);
-    var key = localStorage.getItem("roleName");
-    var user = localStorage.getItem("user");
-    console.log('key', key);
-    if(key === 'manager') {
-      axios
-      .get(`http://localhost:5000/api/projects/?prepared_by=${user}`)
-      .then((response) => {
-        setProjList(response.data)
-        console.log(response.data);
-      })
-      .catch((error) => console.log(error))
-      .finally(setIsLoading(false));
-    }else if(key === 'resource') {
-      var userName = localStorage.getItem("username");
-      console.log(userName);
-      axios
-      .get(`http://localhost:5000/api/projects/resource/?resource_name=${userName}`)
-      .then((response) => {
-       setProjList(response.data)
-        console.log(response.data);
-      })
-      .catch((error) => console.log(error))
-      .finally(setIsLoading(false));
-    }else {
-      console.log('no projects found');
+    const fetchData = async () => {
+      setIsLoading(true);
+      await userData()
+      let key = localStorage.getItem("roleName");
+      let user = localStorage.getItem("user");
+
+      if (key === 'manager') {
+        axios
+          .get(`http://localhost:5000/api/projects/?prepared_by=${user}`)
+          .then((response) => {
+            setProjList(response.data)
+            console.log("Data by manager role", response.data);
+          })
+          .catch((error) => console.log(error))
+          .finally(setIsLoading(false));
+      } else if (key === 'resource') {
+        var userName = localStorage.getItem("username");
+        console.log("userName", userName);
+        axios
+          .get(`http://localhost:5000/api/projects/resource/?resource_name=${userName}`)
+          .then((response) => {
+            setProjList(response.data)
+            console.log("Get projects by resource name", response.data);
+          })
+          .catch((error) => console.log(error))
+          .finally(setIsLoading(false));
+      } else {
+        console.log('no projects found');
+      }
     }
+    fetchData()
   }, []);
-  console.log(isLoading);
+
   return (
     <>
       <div className="nb-estimatesHistory-wrapper">
@@ -140,10 +146,10 @@ const EstimatesHistory = () => {
                 <div className="project-meta">
                   <span>PROPOSAL FOR</span>
                   {/* <h5 key={p._id} onClick={() => handleEditEstimate(p._id)}>{p.proj_name}</h5> */}
-                  <h5>  
-                  <Link to={`/timeline/${p._id}`}>
-                  {p.proj_name}
-                  </Link>
+                  <h5>
+                    <Link to={`/timeline/${p._id}`}>
+                      {p.proj_name}
+                    </Link>
                   </h5>
                   <span>PREPARED BY</span>
                   <p>{p.prepared_by}</p>

@@ -19,6 +19,6 @@ router.get("/", getAllScreen);
 router.post("/:id", addScreen);
 router.get("/screen", getScreenById);
 router.delete("/:id", deleteScreen);
-router.put("/id", updateScreen);
+router.put("/:id", updateScreen);
 
 export default router;
