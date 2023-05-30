@@ -161,29 +161,29 @@ const Timelinecontent = () => {
   // screens added with estimates in screen schema and project status changed as draft
   function savedAsDraft() {
 
-    if (rowsData != "") {
-      axios
-        .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
-        .then((response) => {
-          console.log(response.data);
-          alert("New Screen created successfully");
+    // if (rowsData != "") {
+    //   axios
+    //     .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
+    //     .then((response) => {
+    //       console.log(response.data);
+    //       alert("New Screen created successfully");
 
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-    // project status change
-    axios
-      .put(`http://localhost:5000/api/projects/?_id=${id}`, {
-        proj_status: "Draft",
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    // }
+    // // project status change
+    // axios
+    //   .put(`http://localhost:5000/api/projects/?_id=${id}`, {
+    //     proj_status: "Draft",
+    //   })
+    //   .then((res) => {
+    //     console.log(res.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }
   // total sum
   var totalHours = rowsData.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
@@ -208,15 +208,16 @@ const Timelinecontent = () => {
   function navigatePageD() {
     return navigate("/dashboard");
   }
-  // api
+  // Api
   useEffect(() => {
     console.log(id);
     axios
       .get(`http://localhost:5000/api/projects/${id}`)
       .then((res) => {
         setProjectDetails([res.data]);
-        //console.log([res.data.proj_name]);
+        console.log([res.data.proj_name]);
         localStorage.setItem("projName", res.data.proj_name);
+        localStorage.setItem("projId", res.data._id);
         //console.log(res.data);
       })
       .catch((error) => {

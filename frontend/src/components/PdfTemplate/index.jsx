@@ -1,4 +1,7 @@
 import "./style.scss";  
+import  nextwerkImg from "./images/NEXTWORK.png"
+import  vteamsImg from "./images/vteams.png"
+import  processImg from "./images/process.png"
 
 function PdfTemplate() {
     return (
@@ -32,13 +35,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -73,13 +76,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -90,7 +93,7 @@ function PdfTemplate() {
                         it will make them easy to ﬁnd their medication effortlessly.</p>
                     <div style={{ margin: "50px 0px" }}>
                         <h1>Our <span>Process</span></h1>
-                        <img style={{ marginTop: "50px" }} src="images/process.png" alt="" />
+                        <img style={{ marginTop: "50px" }} src={processImg} alt="" />
                     </div>
                     <p>You will have complete ownership of any resources developed as part of this process; including code,
                         graphics, documentation etc. </p>
@@ -104,13 +107,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="/" />
+                                <img src={vteamsImg} alt="/" />
                             </td>
                         </tr>
                     </table>
@@ -194,13 +197,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -263,13 +266,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -356,13 +359,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -393,13 +396,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>
@@ -435,13 +438,13 @@ function PdfTemplate() {
                     <table>
                         <tr>
                             <td className="nextwork">
-                                <img src="./images/NEXTWORK.png" alt="" />
+                                <img src={nextwerkImg} alt="" />
                             </td>
                             <td className="heading">
                                 NX-DEV-T-01-v1.0-Private-Development Proposal vteams
                             </td>
                             <td className="vtemas">
-                                <img src="./images/vteams.png" alt="" />
+                                <img src={vteamsImg} alt="" />
                             </td>
                         </tr>
                     </table>

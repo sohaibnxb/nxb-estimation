@@ -2,10 +2,11 @@ import React from 'react'
 import EstimatesHistory from './EstimatesHistory'
 import Stats from './Stats'
 import Statuses from './Statuses'
-import PDFGenerator from '../../PDFGenerator/PDFGenerator'
 //styles
 import "./Style.scss"
+
 const Content = () => {
+
   return (
     <>
       <section className='nb-section'>
@@ -21,8 +22,6 @@ const Content = () => {
             <Stats />
           </div>
         </div>
-        <PDFGenerator />
-
       </section>
     </>
   )

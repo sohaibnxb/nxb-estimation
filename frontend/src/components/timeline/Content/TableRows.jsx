@@ -16,11 +16,12 @@ const TableRows = ({
   showExtraRow,
   handleExtraChange,
   deleteTableExtraRows,
+  addTableRows
 }) => {
   return rowsData.map((data, index) => {
-    const { screenName, hours , screenSections } = data;
+    const { screenName, hours, screenSections } = data;
 
-   
+
     return (
       <>
         <tr key={index}>
@@ -32,6 +33,11 @@ const TableRows = ({
                 name="screenName"
                 placeholder="App Icon"
                 onChange={(evnt) => handleChange(index, evnt)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    addTableRows()
+                  }
+                }}
                 value={screenName}
               />
             </FormControl>
@@ -41,44 +47,49 @@ const TableRows = ({
             >
               +
             </Button>
-           
 
-              {screenSections.length > 0
-                ? screenSections.map((elem, subIndex) => {
-                    //const { screenSections } = elem;
-                    return (
-                      <>
-                        <td className="subRowInput">
-                        <FormControl key={elem.subIndex}>
-                          <TextField
-                            type="text"
-                            key={subIndex}
-                            variant="standard"
-                            name="screenSections"
-                            placeholder="Login Screen"
-                            onChange={(evnt) => handleExtraChange(index, subIndex, evnt)}
-                            value={elem}
-                          />
-                        </FormControl>
-                        <span
-                          className="subdata"
-                          onClick={() => deleteTableExtraRows(index, subIndex)}
-                        ></span>
-                        </td>
-                      </>
-                    );
-                  })
-                : ""}
-                
-            </td>
-          
+
+            {screenSections.length > 0
+              ? screenSections.map((elem, subIndex) => {
+                //const { screenSections } = elem;
+                return (
+                  <>
+                    <td className="subRowInput">
+                      <FormControl key={elem.subIndex}>
+                        <TextField
+                          type="text"
+                          key={subIndex}
+                          variant="standard"
+                          name="screenSections"
+                          placeholder="Login Screen"
+                          onChange={(evnt) => handleExtraChange(index, subIndex, evnt)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              addSubRows(index)
+                            }
+                          }}
+                          value={elem}
+                        />
+                      </FormControl>
+                      <span
+                        className="subdata"
+                        onClick={() => deleteTableExtraRows(index, subIndex)}
+                      ></span>
+                    </td>
+                  </>
+                );
+              })
+              : ""}
+
+          </td>
+
           <td>
             <FormControl>
               <TextField
                 variant="standard"
                 name="hours"
                 placeholder="2"
-                
+
                 onChange={(evnt) => handleChange(index, evnt)}
                 value={hours}
               />

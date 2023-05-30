@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Navigate, useNavigate } from "react-router";
 import Select, { components } from "react-select";
 import Topbar from "../common/Topbar";
@@ -9,7 +9,8 @@ import Search from "../../assets/images/search.svg";
 import "./style.scss";
 import ProgressBar from "../common/ProgressBar";
 import axios from "axios";
-
+import ReactPDF, { PDFDownloadLink, PDFViewer, BlobProvider } from '@react-pdf/renderer';
+import ReactPdf from "../ReactPdf/ReactPdf";
 const DropdownIndicator = (props) => {
   return (
     <components.DropdownIndicator {...props}>
@@ -24,6 +25,9 @@ const Languages = () => {
   const [message, setMessage] = useState();
   const [vteam, setVteam] = useState('6395ded86d71e15926fbbdc1');
   const [nxb, setNxb] = useState('6395df75a9038f587df95185');
+  const [project, setProject] = useState(null)
+  const [isReady, setIsReady] = useState(false);
+
   const options = [
     { value: "PHP", label: "PHP" },
     { value: "HTML5", label: "HTML5" },
@@ -59,6 +63,8 @@ const Languages = () => {
       })
       .then((response) => {
         console.log(response.data);
+        setProject(response.data)
+
       })
       .catch((error) => {
         console.log(error);
@@ -80,19 +86,22 @@ const Languages = () => {
     await addTagsAndTerms();
     var projName = localStorage.getItem("projName");
     // vteams template
-    axios
-      .put("http://localhost:5000/api/projects/temp", {
-        proj_name: projName,
-        temp_id: vteam,
-      })
-      .then((response) => {
-        console.log(response.data);
-        navigate("/dashboard");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await axios
+        .put("http://localhost:5000/api/projects/temp", {
+          proj_name: projName,
+          temp_id: vteam,
+        })
+      console.log(response.data);
+      if (response) {
+        setIsReady(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
   }
+
   async function AddNxbTemp() {
     await addTagsAndTerms();
     var projName = localStorage.getItem("projName");
@@ -110,6 +119,9 @@ const Languages = () => {
         console.log(error);
       });
   }
+  useEffect(() => {
+
+  }, [])
   return (
     <>
       <Topbar estimate={false} limiteRole={false} />
@@ -176,16 +188,25 @@ const Languages = () => {
           <Button
             variant="contained"
             className="secondary-btn estimate-nav-btn"
+            onClick={() => navigate(-1)}
+
           >
             Back
           </Button>
-          <Button
-            variant="contained"
-            className="secondary-btn estimate-nav-btn"
-            onClick={addTagsAndTerms}
-          >
-            Preview
-          </Button>
+
+          <BlobProvider document={<ReactPdf languages={selectedOption} />}>
+            {({ url }) => (
+              <a href={url} target="_blank">
+                <Button
+                  variant="contained"
+                  className="secondary-btn estimate-nav-btn"
+                  onClick={addTagsAndTerms}
+                >
+                  Preview
+                </Button>
+              </a>
+            )}
+          </BlobProvider>
           <Button
             variant="contained"
             className=" dark-button estimate-nav-btn"
@@ -196,19 +217,38 @@ const Languages = () => {
             </span>
             Download PDF
           </Button>
-          <Button
-            variant="contained"
-            className="blue-button estimate-nav-btn"
-            onClick={AddVteamTemp}
 
-          >
-            <span className="btn-icon">
-              <img src={Pdf} alt="Pdf" />
-            </span>
-            Download PDF
-          </Button>
+
+          <PDFDownloadLink document={<ReactPdf languages={selectedOption} />} fileName="Estimation.pdf">
+            {({ blob, url, loading, error }) =>
+              loading ? (
+                <Button
+                  variant="contained"
+                  className="blue-button estimate-nav-btn"
+                  onClick={AddVteamTemp}
+                >
+                  <span className="btn-icon">
+                    <img src={Pdf} alt="Pdf" />
+                  </span>
+                  Gen PDF
+                </Button>) :
+                (
+                  <Button
+                    variant="contained"
+                    className="blue-button estimate-nav-btn"
+                    onClick={AddVteamTemp}
+                  >
+                    <span className="btn-icon">
+                      <img src={Pdf} alt="Pdf" />
+                    </span>
+                    Download PDF
+                  </Button>
+                )
+            }
+          </PDFDownloadLink>
         </div>
-      </form>
+      </form >
+
       <Footer />
 
     </>
@@ -216,3 +256,6 @@ const Languages = () => {
 };
 
 export default Languages;
+
+
+// Sir last day I worked on pdf generation 

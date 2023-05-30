@@ -109,7 +109,7 @@ const getProjectById = (req, res) => {
       res.send(result);
     })
     .catch((err) => {
-      res.send({ message: "Project not found" });
+      res.status(404).send({ message: "Project not found" });
       console.log(err);
     });
 };

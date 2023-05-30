@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //css
 import "./index.scss";
+import PdfTest from "./components/PdfTest/PdfTest";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,6 +38,7 @@ function App() {
         <Route path="/languages" element={<Languages />}></Route>
         <Route path="/timeline/:id" element={<Timeline />}></Route>
         <Route path="/pdftemplate" element={<PdfTemplate />}></Route>
+        <Route path="/pdftest" element={<PdfTest />}></Route>
         <Route path="*" element={<NotFoundpage />} />
       </Routes>
     </>

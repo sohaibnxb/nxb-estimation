@@ -137,10 +137,12 @@ const EstimatesHistory = () => {
               <div className="nb-estimatesHistory-content" key={p._id}>
                 <div className="calender-wrapper">
                   <div className="date-box">
-                    <span>{moment(p.createdAt).format("DD")}</span>
+                    {/* {console.log("proj", p)} */}
+
+                    <span>{moment(p?.created_date).format("DD")}</span>
                   </div>
                   <div className="monthYear-box">
-                    <span>{moment(p.createdAt).format("MMM YY")}</span>
+                    <span>{moment(p?.created_date).format("MMM YY")}</span>
                   </div>
                 </div>
                 <div className="project-meta">

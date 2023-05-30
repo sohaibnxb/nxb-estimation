@@ -124,6 +124,7 @@ const Costing = () => {
           <Button
             variant="contained"
             className="secondary-btn estimate-nav-btn"
+            onClick={() => navigate(-1)}
           >
             Back
           </Button>
@@ -136,7 +137,7 @@ const Costing = () => {
             Next
           </Button>
         </div>
-      </form>
+      </form >
       <Footer />
     </>
   );
