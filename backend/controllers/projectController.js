@@ -279,7 +279,6 @@ const searchProjectsByTags = (req, res) => {
     ],
   })
     .then((result) => {
-      console.log(result);
       res.status(200).json(result);
     })
     .catch((err) => {
@@ -325,6 +324,27 @@ const ProjectSortByV = (req, res) => {
     });
 };
 // sort by nxb
+// const ProjectSortByN = (req, res) => {
+//   Project.find({
+//     $and: [
+//       { temp_id: "6395df75a9038f587df95185" },
+//       {
+//         $or: [
+//           { resource_name: req.query.resource_name },
+//           { prepared_by: req.query.prepared_by },
+//         ],
+//       },
+//     ],
+//   })
+//     .sort()
+//     .then((result) => {
+//       res.status(200).json(result);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
 const ProjectSortByN = (req, res) => {
   Project.find({
     $and: [
@@ -339,6 +359,7 @@ const ProjectSortByN = (req, res) => {
   })
     .sort()
     .then((result) => {
+      console.log(result);
       res.status(200).json(result);
     })
     .catch((err) => {
@@ -346,12 +367,13 @@ const ProjectSortByN = (req, res) => {
     });
 };
 const DescProjects = (req, res) => {
-  Project.find({
-    $or: [
-      { resource_name: req.query.resource_name },
-      { prepared_by: req.query.prepared_by },
-    ],
-  })
+  Project.find({ prepared_by: req.query.prepared_by })
+    // Project.find({
+    //   $or: [
+    //     { resource_name: req.query.resource_name },
+    //     { prepared_by: req.query.prepared_by },
+    //   ],
+    // })
     .sort({ created_date: -1 })
     .then((result) => {
       res.send(result);

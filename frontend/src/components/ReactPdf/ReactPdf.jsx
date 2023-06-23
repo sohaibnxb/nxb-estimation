@@ -12,8 +12,6 @@ import OpenSansBold from './fonts/OpenSans-Bold.ttf';
 import OpenSansBoldItalic from './fonts/OpenSans-BoldItalic.ttf';
 
 
-
-
 const ReactPdf = ({ languages }) => {
 
     const [project, setProject] = useState(null)
@@ -23,6 +21,7 @@ const ReactPdf = ({ languages }) => {
         return accumulator + parseInt(screen.hours);
     }, 0)
 
+    const notes = project?.terms_conditions.split(/[.\n]+/);
     const fetchProject = async (project) => {
         const projId = localStorage.getItem("projId")
         console.log("projId", projId);
@@ -77,6 +76,7 @@ const ReactPdf = ({ languages }) => {
         ],
     });
 
+    // Style Object
     const styles = StyleSheet.create({
         page: {
             color: '#000000',
@@ -282,7 +282,6 @@ const ReactPdf = ({ languages }) => {
                     paddingVertical: '4px'
                 },
 
-
             },
             languages: {
                 title: {
@@ -292,14 +291,26 @@ const ReactPdf = ({ languages }) => {
                     marginVertical: '2px'
                 }
             },
-            notes: {
-                border: '1px solid #E5E5E5',
-                paddingVertical: '8px',
-                paddingHorizontal: '8px',
-            }
-
 
         },
+
+        // Asumptions
+        asmptionPage: {
+            languages: {
+                title: {
+                    marginVertical: '10px',
+                },
+                language: {
+                    marginVertical: '2px'
+                }
+            },
+            notes: {
+                note: {
+                    marginVertical: '2px'
+                }
+            }
+        },
+
 
         // Terms & Conditions
         termsPage: {
@@ -318,6 +329,7 @@ const ReactPdf = ({ languages }) => {
         }
 
     });
+
     return (
         <Document>
             {/* Main Page */}
@@ -465,26 +477,41 @@ const ReactPdf = ({ languages }) => {
                         </View>
                     </View>
 
+                </View>
+            </Page>
+
+
+            {/* languages & Notes */}
+            <Page style={styles.page}>
+                <View style={[styles.section]}>
+                    {/* Header */}
+                    <View style={styles.header} fixed>
+                        <Image style={styles.header.nextwerkImg} src={nextwerkImg} quality={90} />
+                        <Text style={styles.header.text}>NX-DEV-T-01-v1.0-Private-Development Proposal vteams</Text>
+                        <Image style={styles.header.vteamsImg} src={vteamsImg} quality={90} />
+                    </View>
+
+                    <Text style={styles.heading}>Assumption & <Text style={styles.heading.bold}>Questions</Text></Text>
+
                     {/* Languages */}
                     <View>
-                        <Text style={[styles.heading, styles.costingPage.languages.title]}>Programming <Text style={styles.heading.bold}>Languages</Text></Text>
+                        <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Programming <Text style={styles.heading.bold}>Languages & Tools</Text></Text>
                         {
-                            languages?.map((language, index) => <Text style={styles.costingPage.languages.language}><Text>{index + 1}. </Text>{language.value}</Text>)
+                            languages?.map((language, index) => <Text style={styles.asmptionPage.languages.language}><Text>{index + 1}. </Text>{language.value}</Text>)
                         }
 
                     </View>
 
                     {/* Imp Notes */}
                     <View>
-                        <Text style={[styles.heading, styles.costingPage.languages.title]}>Important <Text style={styles.heading.bold}>Notes</Text></Text>
-                        <View style={styles.costingPage.notes}>
-                            <Text >Estimate is prepared based on our understanding of tasks as listed above. Any modification or addition in above task list will affect time and cost as per scope. Logo, Images, video and other content will be provided by client. We will use Bootstrap as our HTML/CSS stan dards. Markup will be compatible to all modern browsers, for internet explorer, version 12 and above will be supportive onlys</Text>
+                        <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Important <Text style={styles.heading.bold}>Notes</Text></Text>
+                        <View style={styles.asmptionPage.notes}>
+                            
+                            {notes?.map((note, index) => <Text key={index}><Text>{index + 1}. </Text>{note}</Text>)}
                         </View>
                     </View>
-
                 </View>
             </Page>
-
 
 
             {/* Terms & Conditions */}
@@ -502,10 +529,10 @@ const ReactPdf = ({ languages }) => {
                         <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>01 </Text> Change Requests</Text>
                         <Text>The quoted price and time estimate covers only the features listed in this document. A revised quote will be provided in case of any changes suggested to this proposal. Any change requests coming in while development is in progress will be entertained after the completion of development committed to in this proposal.</Text>
 
-                        <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>02 </Text> 02 Third Party Services</Text>
+                        <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>02 </Text> Third Party Services</Text>
                         <Text>The quote provided in this proposal does not include hosting costs or any third party service integration cost. In case a third party service is required, the client will be informed of any additional costs prior to its purchase.</Text>
 
-                        <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>03 </Text> 03 Approval</Text>
+                        <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>03 </Text> Approval</Text>
                         <Text>Client will have 7 days after delivery of the final build to conduct acceptance tests. If no issue is reported during this period, the app will be considered accepted by the Client.</Text>
 
                         <Text style={styles.termsPage.title}><Text style={styles.termsPage.numbers}>04 </Text> Intellectual Rights</Text>
@@ -534,6 +561,7 @@ const ReactPdf = ({ languages }) => {
                         {/* Content */}
                         <Text style={styles.heading}>Next <Text style={styles.heading.bold}>Steps</Text></Text>
                         <Text>You are welcome to reach out to us at any suitable time via email, phone or Skype to discuss this proposal or any ideas you may have had.</Text>
+                        <Text> </Text>
                         <Text>If you've got everything you need and are ready to get started the work, please contact (name), our Development Manager so we can set everything up for you.</Text>
 
                     </View>
@@ -545,4 +573,3 @@ const ReactPdf = ({ languages }) => {
 };
 
 export default ReactPdf;
-

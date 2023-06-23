@@ -1,22 +1,30 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom"
-import { Button, Popover, Typography } from '@mui/material'
+import { Button, Tooltip, IconButton, Avatar, Typography, Menu, MenuItem } from '@mui/material'
 // images
 import Notifi from "../../../assets/images/notifi.png";
-import { useState } from 'react';
 
 const Topbar = ({ estimate = false }) => {
   const [showEstimate, setShowEstimate] = useState(estimate);
   const [limitRole, setLimitRole] = useState(false);
   const navigate = useNavigate();
-  const [elem, setelem] = React.useState(null);
-  const handleProfile = (event) => {
-    setelem(event.currentTarget);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => { 
-    setelem(null);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
-  const open = Boolean(elem);
+
+  // const [elem, setelem] = React.useState(null);
+  // const handleProfile = (event) => {
+  //   setelem(event.currentTarget);
+  // };
+  // const handleClose = () => {
+  //   setelem(null);
+  // };
+  // const open = Boolean(elem);
   const removeToken = () => {
     localStorage.removeItem("access-token");
     localStorage.removeItem("user");
@@ -78,24 +86,62 @@ const Topbar = ({ estimate = false }) => {
           {/* <div className='nb-notifi-wrapper'>
                 <img src={Notifi} alt="notification"/>
             </div> */}
-          <div className='nb-profile-wrapper' onClick={handleProfile}>
+          {/* <div className='nb-profile-wrapper' onClick={handleClick}>
             {profileName}
-          </div>
-          <Popover
+          </div> */}
+          <Tooltip title="Profile">
+            <IconButton
+              onClick={handleClick}
+              size="small"
+              sx={{ ml: 2 }}
+              aria-controls={open ? 'account-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+            >
+              <Avatar sx={{ width: 40, height: 40 }}>{profileName}</Avatar>
+            </IconButton>
+          </Tooltip>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
             open={open}
-            anchorEl={elem}
             onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
             }}
-            className="profile-popover"
-            onClick={handleProfile}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiAvatar-root': {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <Typography variant="h5" component="h5">
-              <a onClick={removeToken}>Logout</a>
-            </Typography>
-          </Popover>
+            <MenuItem onClick={removeToken}>
+              <Typography>Logout</Typography>
+            </MenuItem>
+          </Menu>
         </div>
       </header>
     </>

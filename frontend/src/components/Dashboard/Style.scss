@@ -1,6 +1,8 @@
 @import "../../assets/scss/theme.scss";
 @import "../../assets/scss/mixin.scss";
+
 .nb-page-container {
     background: map-get($page_bg, "bg1");
     height: 100vh;
+    padding-bottom: 40px;
 }

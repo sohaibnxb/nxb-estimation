@@ -2,24 +2,28 @@
 @import './assets/scss/mixin.scss';
 @import './assets/scss/main.scss';
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-size: 16px;
 }
 
-body{
-  background-color: map-get($page_bg, 'bg1' );
-  font-family: map-get($font-family, 'regular' );
+body {
+  background-color: map-get($page_bg, 'bg1');
+  font-family: map-get($font-family, 'regular');
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
 
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
 
@@ -31,4 +35,20 @@ img {
 a {
   color: map-get($base_colors, "white");
   text-decoration: none;
- }
+}
+
+//  Custom Scrollbar
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+*::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+}

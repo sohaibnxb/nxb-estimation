@@ -1,6 +1,5 @@
 import React from 'react'
 import EstimatesHistory from './EstimatesHistory'
-import Stats from './Stats'
 import Statuses from './Statuses'
 //styles
 import "./Style.scss"
@@ -19,7 +18,6 @@ const Content = () => {
           </div>
           <div className='nb-dashboard-status'>
             <Statuses />
-            <Stats />
           </div>
         </div>
       </section>

@@ -1,11 +1,19 @@
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 export async function loginUser(username, password, navigate) {
   const payload = { username, password };
   console.log(username);
   console.log(password);
   try {
-    const response = await axios.post("http://localhost:5000/api/users/signin", payload)
+    const response = await toast.promise(
+      axios.post("http://localhost:5000/api/users/signin", payload),
+      {
+        pending: 'Authentication is pending',
+        success: 'Login successfully ',
+        error: 'Invalid username or password'
+      }
+    );
     if (response) {
       localStorage.setItem("access-token", JSON.stringify(response.data.token));
       localStorage.setItem("user", response.data.FullName);
@@ -14,11 +22,11 @@ export async function loginUser(username, password, navigate) {
         "managerName",
         response.data.managerName
       );
+
       navigate('/dashboard');
     }
 
   } catch (error) {
-    alert("These credentials do not match our records")
+    console.log("These credentials do not match our records")
   }
-
 }

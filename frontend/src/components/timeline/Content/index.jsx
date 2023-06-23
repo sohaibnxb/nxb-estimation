@@ -3,6 +3,7 @@ import { Button, Card, CardContent } from "@mui/material";
 import SelectIcon from "../../../assets/images/select.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { toast } from 'react-toastify';
 import TableRows from "./TableRows";
 import TableDataRows from "./TableDataRows";
 
@@ -27,9 +28,9 @@ const Timelinecontent = () => {
     setShowRow(true);
   };
   // add sub row
-  const addSubRows = (index) => {
+  const addSubRows = (index, subIndex) => {
     var temp = [...rowsData];
-    temp[index].screenSections.push("");
+    temp[index].screenSections.splice(subIndex + 1, 0, "");
     setRowsData([...temp]);
   };
   // delete rows
@@ -85,48 +86,53 @@ const Timelinecontent = () => {
       console.log("projectEstimation", projectEstimation);
       debugger
       if (projectEstimation == "") {
-        await axios
-          .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
+
+        await toast.promise(axios.post(`http://localhost:5000/api/screens/${id}`, { rowsData }), {
+          pending: 'Creating new screen',
+          success: 'New Screen created successfully',
+          error: 'Error in creating new screen'
+        })
           .then((response) => {
             console.log(response.data);
-            alert("New Screen created successfully");
-
           })
           .catch((error) => {
             console.log(error);
           });
-        alert("if");
+        // alert("if");
       }
       else {
         debugger
-        await axios
-          .put(`http://localhost:5000/api/screens/${id}`, {
-            project_id: id,
-            screens: rowsData,
-          })
+        await toast.promise(axios.put(`http://localhost:5000/api/screens/${id}`, {
+          project_id: id,
+          screens: rowsData,
+        }), {
+          pending: 'Updating new screen',
+          success: 'Update screen estimation successfully',
+          error: 'Error in creating new screen'
+        })
           .then((response) => {
             console.log(response.data);
             debugger
-            alert("Update screen estimation successfully");
           })
           .catch((error) => {
             console.log(error);
           });
-        alert("else");
+        // alert("else");
       }
       debugger
       // Notification send it to manager
       var key = localStorage.getItem("username");
       var projKey = localStorage.getItem("projName");
       var managerKey = localStorage.getItem("managerName");
-      axios
-        .post(
-          `http://localhost:5000/api/notifications/?senderName=${key}&receiptName=${managerKey}&projectName=${projKey}&read=false&count=1`
-        )
+      await toast.promise(axios.post(
+        `http://localhost:5000/api/notifications/?senderName=${key}&receiptName=${managerKey}&projectName=${projKey}&read=false&count=1`
+      ), {
+        pending: 'Sending notification',
+        success: 'Notification sent successfully to your manager',
+        error: 'Error in sending notifications'
+      })
         .then((res) => {
           console.log(res.data);
-          alert("Notification sent successfully to your manager");
-
         })
         .catch((error) => {
           console.log(error);
@@ -277,6 +283,7 @@ const Timelinecontent = () => {
                           <img src={SelectIcon} alt="select" />
                         </div>
                       </th>
+                      <th></th>
                     </tr>
                   </thead>
                   {rowsData == "" ? (
@@ -304,6 +311,7 @@ const Timelinecontent = () => {
                           <tr className="totalRow">
                             <td>Total</td>
                             <td>{totalHours}</td>
+                            <td></td>
                           </tr>
                           <Button onClick={addTableRows} className="AddRow">
                             Add new Row
@@ -314,6 +322,7 @@ const Timelinecontent = () => {
                       )}
                     </tbody>
                   ) : (
+
                     <tbody>
                       <TableRows
                         rowsData={rowsData}
@@ -331,6 +340,7 @@ const Timelinecontent = () => {
                           <tr className="totalRow">
                             <td>Total</td>
                             <td>{totalHours}</td>
+                            <td></td>
                           </tr>
                           <Button onClick={addTableRows} className="AddRow">
                             Add new Row
@@ -342,6 +352,7 @@ const Timelinecontent = () => {
                 </table>
               </div>
             </div>
+
             <div className="main_content--right">
               <Card className="card-padding">
                 <CardContent>

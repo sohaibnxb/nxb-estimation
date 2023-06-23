@@ -47,17 +47,14 @@ const authUser = (req, res) => {
     .then((userExist) => {
       if (userExist) {
         // console.log(userExist.password);
-        bcrypt
-          .compare(password, userExist.password)
+        bcrypt.compare(password, userExist.password)
           .then((p) => {
             // console.log(p);
             if (p) {
               const generateToken = jwt.sign(
                 { _id: userExist._id },
                 process.env.JWT_SECRET,
-                {
-                  expiresIn: "1d",
-                }
+                { expiresIn: "1d" }
               );
 
               // save token
@@ -69,19 +66,20 @@ const authUser = (req, res) => {
                 token: generateToken,
               });
             } else {
-              return res.status(404).json({ message: "Password is not valid" });
+              return res.status(404).json({ message: "Password is not valid1" });
             }
           })
           .catch((err) => {
             console.log(err);
-            return res.status(404).json({ message: "Password is not valid" });
+            return res.status(404).json({ message: "Password is not valid2" });
           });
       } else {
-        return res.status(404).json({ message: "User is not found" });
+        return res.status(404).json({ message: "User not found" });
       }
     })
     .catch((err) => {
       console.log(err);
+      console.log('error from user db', err);
     });
 };
 

@@ -18,7 +18,7 @@ const TableRows = ({
   deleteTableExtraRows,
   addTableRows
 }) => {
-  return rowsData.map((data, index) => {
+  return rowsData.map((data, index) => { 
     const { screenName, hours, screenSections } = data;
 
 
@@ -47,14 +47,19 @@ const TableRows = ({
             >
               +
             </Button>
-
-
             {screenSections.length > 0
               ? screenSections.map((elem, subIndex) => {
                 //const { screenSections } = elem;
                 return (
                   <>
                     <td className="subRowInput">
+                      <span className="sub-screen-index">{index + 1}.{subIndex + 1}.</span>
+                      <Button
+                        className="secondary-button add-subRow"
+                        onClick={() => addSubRows(index, subIndex)}
+                      >
+                        +
+                      </Button>
                       <FormControl key={elem.subIndex}>
                         <TextField
                           type="text"
@@ -65,7 +70,7 @@ const TableRows = ({
                           onChange={(evnt) => handleExtraChange(index, subIndex, evnt)}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                              addSubRows(index)
+                              addSubRows(index, subIndex)
                             }
                           }}
                           value={elem}
@@ -95,10 +100,26 @@ const TableRows = ({
               />
             </FormControl>
           </td>
-          <span
-            className="data"
-            onClick={(e) => deleteTableRows(index)}
-          ></span>
+
+          <td>
+            <Button
+              className="secondary-button  timeline-action-btn"
+              onClick={(e) => deleteTableRows(index)}
+            >
+              x
+            </Button>
+            <Button
+              className="secondary-button timeline-action-btn"
+              onClick={() => addTableRows()}
+            >
+              +
+            </Button>
+
+            {/* <span
+              className="data"
+              onClick={(e) => deleteTableRows(index)}
+            ></span> */}
+          </td>
         </tr>
         {/* <tr className="totalRow">
           <td>Total</td>

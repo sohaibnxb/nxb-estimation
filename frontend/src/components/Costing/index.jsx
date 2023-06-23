@@ -3,6 +3,7 @@ import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
 import ProgressBar from "../common/ProgressBar";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import {
   FormControl,
@@ -38,11 +39,16 @@ const Costing = () => {
         });
       debugger
       if (projectCostExist.length == 0) {
-        alert('dont exist');
-        const postReq = await axios.post(`http://localhost:5000/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`)
+        const postReq = await toast.promise(
+          axios.post(`http://localhost:5000/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`),
+          {
+            pending: 'Adding Project Costing',
+            success: 'Costing added successfully',
+            error: 'Error adding project costing'
+          }
+        )
           .then((response) => {
             console.log(response.data);
-            alert('new costing insert');
             navigate("/languages");
           })
           .catch((error) => {
@@ -50,16 +56,21 @@ const Costing = () => {
           });
       } else {
         debugger
-        alert('exist');
         var projName = localStorage.getItem('projName');
-        const putReq = axios.put("http://localhost:5000/api/costing/id", {
-          projectName: projName,
-          totalHours: state,
-          hourRate: hours,
-          totalCost: totalcost,
-        })
+        const putReq = await toast.promise(
+          axios.put("http://localhost:5000/api/costing/id", {
+            projectName: projName,
+            totalHours: state,
+            hourRate: hours,
+            totalCost: totalcost,
+          }),
+          {
+            pending: 'Updating Project Costing',
+            success: 'Costing updated successfully',
+            error: 'Error updating project costing'
+          }
+        )
           .then((response) => {
-            alert('costing update');
             navigate("/languages");
           })
           .catch((error) => {

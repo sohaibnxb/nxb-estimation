@@ -8,7 +8,6 @@ export const userData = async () => {
     const notifications = await axios.get(`http://localhost:5000/api/notifications?receiptName=${username}`)
         .then((res) => {
             var notifi = res.data;
-            console.log("notifi", notifi);
             return notifi;
         })
         .catch((error) => {
@@ -17,13 +16,11 @@ export const userData = async () => {
     const roleName = await axios.get(`http://localhost:5000/api/users/selectedUser?username=${username}`)
         .then((res) =>
             res.data.map((results, index) => {
-                console.log("roleName", results.role_id.name);
                 return results.role_id.name;
             })
         )
         .then((newData) => {
             var isResouce = newData;
-            console.log("isResouce", isResouce);
             // debugger
             localStorage.setItem("roleName", isResouce);
             return isResouce;
