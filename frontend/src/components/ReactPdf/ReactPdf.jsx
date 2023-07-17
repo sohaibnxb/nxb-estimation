@@ -12,9 +12,10 @@ import OpenSansBold from './fonts/OpenSans-Bold.ttf';
 import OpenSansBoldItalic from './fonts/OpenSans-BoldItalic.ttf';
 
 
-const ReactPdf = ({ languages }) => {
+const ReactPdf = () => {
 
     const [project, setProject] = useState(null)
+    const [languages,setLanguages] = useState(null)
     const [projectCost, setProjectCost] = useState(null)
     const [projectScreens, setProjectScreens] = useState(null)
     const sum = projectScreens?.screens?.reduce((accumulator, screen) => {
@@ -29,7 +30,6 @@ const ReactPdf = ({ languages }) => {
             const response = await axios.get(`http://localhost:5000/api/projects/${projId}`)
             console.log("proj response", response);
             setProject(response.data)
-
         } catch (error) {
             console.log(error);
         }
@@ -497,7 +497,7 @@ const ReactPdf = ({ languages }) => {
                     <View>
                         <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Programming <Text style={styles.heading.bold}>Languages & Tools</Text></Text>
                         {
-                            languages?.map((language, index) => <Text style={styles.asmptionPage.languages.language}><Text>{index + 1}. </Text>{language.value}</Text>)
+                            project?.proj_tags?.map((language, index) => <Text style={styles.asmptionPage.languages.language}><Text>{index + 1}. </Text>{language}</Text>)
                         }
 
                     </View>

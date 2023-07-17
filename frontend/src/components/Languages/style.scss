@@ -28,6 +28,7 @@
     color: map-get($base_colors, "primary");
     border: 1px solid map-get($base_colors, "input-border-color");
     display: block;
+
     ol {
       list-style: decimal;
       padding: 0 16px;
@@ -57,6 +58,40 @@
     .btn-icon {
       display: inherit;
       margin-right: 9px;
+    }
+  }
+
+  .preview-dropdown {
+    position: relative;
+
+    &-menu {
+      position: absolute;
+      width: 100%;
+      top: -6rem;
+      background-color: white;
+      color: black;
+      padding: 0;
+      z-index: 1000;
+      display: none;
+      box-shadow: 1px 1px 4px 0px #00000040;
+      border-radius: 6px;
+      border: 1px solid map-get($base_colors, "input-border-color");
+
+      &.show {
+        display: block;
+      }
+
+
+      a {
+        color: black;
+        display: block;
+        width: 100%;
+        padding: 8px 10px;
+
+        &:hover {
+          background-color: map-get($base_colors, status-bar-color);
+        }
+      }
     }
   }
 }
