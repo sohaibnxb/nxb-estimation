@@ -18,7 +18,7 @@ const TableRows = ({
   deleteTableExtraRows,
   addTableRows
 }) => {
-  return rowsData.map((data, index) => { 
+  return rowsData?.map((data, index) => { 
     const { screenName, hours, screenSections } = data;
 
 

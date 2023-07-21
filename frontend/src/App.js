@@ -7,24 +7,35 @@ import Costing from "./components/Costing";
 import Languages from "./components/Languages";
 import Timeline from "./components/timeline";
 
+import jwt from 'jwt-decode'
+
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //css
 import "./index.scss";
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const checkUserToken = () => {
-    const userToken = localStorage.getItem("access-token");
-    const token = JSON.parse(userToken);
-    // console.log(token);
-    if (!token) {
-      setIsLoggedIn(false);
-    }
-    setIsLoggedIn(true);
-  };
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const checkUserToken = () => {
+  //   const userToken = localStorage.getItem("access-token");
+  //   const token = JSON.parse(userToken);
+  //   // console.log(token);
+  //   if (!token) {
+  //     setIsLoggedIn(false);
+  //   }
+  //   setIsLoggedIn(true);
+  // };
+  // useEffect(() => {
+  //   checkUserToken();
+  // }, [isLoggedIn]);
+
   useEffect(() => {
-    checkUserToken();
-  }, [isLoggedIn]);
+    const token = localStorage.getItem("access-token");
+    if (token) {
+      const user = jwt(token);
+      
+    }
+  }, [])
   return (
     <>
       <Routes>

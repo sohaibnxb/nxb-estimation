@@ -52,7 +52,11 @@ const authUser = (req, res) => {
             // console.log(p);
             if (p) {
               const generateToken = jwt.sign(
-                { _id: userExist._id },
+                {
+                  _id: userExist._id,
+                  username: userExist.username,
+                  FullName: userExist.FullName,
+                },
                 process.env.JWT_SECRET,
                 { expiresIn: "1d" }
               );
@@ -60,7 +64,6 @@ const authUser = (req, res) => {
               // save token
               return res.status(200).json({
                 username: userExist.username,
-                password: userExist.password,
                 FullName: userExist.FullName,
                 managerName: userExist.managerName,
                 token: generateToken,

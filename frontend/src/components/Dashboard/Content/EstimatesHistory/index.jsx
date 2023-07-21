@@ -1,119 +1,94 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import jwt from 'jwt-decode'
 import moment from "moment";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from "@mui/material";
-import { userData } from "./services";
+
+import { getRole, getNotifications, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects } from "../../redux/dashboardActions";
+
 import SearchIcon from "../../../../assets/images/search.svg";
 import SelectIcon from "../../../../assets/images/select.svg";
 
+
 const EstimatesHistory = () => {
-  const [projList, setProjList] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = async () => {
-    var key = inputSearch;
-    setIsLoading(true);
-    axios
-      .get(`http://localhost:5000/api/projects/search/?proj_name=${key}&proj_tags=${key}`)
-      .then((response) => {
-        setProjList(response.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const userToken = useSelector(state => state.auth.userToken)
+  const { projects, notifications, role, loading } = useSelector(state => state.dashboard)
+  
+  const { username, FullName } = jwt(userToken);
+
+
+  // const { userInfo } = useSelector(state => state.auth)
+
+  const dispatch = useDispatch()
+
   const handleSelected = async (event) => {
     var selectedVal = event.target.value;
-    let user = localStorage.getItem("user");
     if (selectedVal === "Vteams") {
-      console.log(selectedVal);
-      axios
-        .get("http://localhost:5000/api/projects/Vsort")
-        .then((response) => {
-          setProjList(response.data);
-          console.log("res from vteams", response.data);
-        })
-        .catch((error) => console.log(error));
+
+      dispatch(getVteamsProjects())
     } else if (selectedVal === "Nextbridge") {
-      axios
-        .get("http://localhost:5000/api/projects/Nsort")
-        .then((response) => {
-          setProjList(response.data);
-          console.log("res from nxb", response.data);
-        })
-        .catch((error) => console.log(error));
+
+      dispatch(getNxbProjects())
+
     } else if (selectedVal === "RecentlyAdded") {
 
-      axios
-        .get(`http://localhost:5000/api/projects/dsort?prepared_by=${user}`)
-        .then((response) => {
-          setProjList(response.data);
-          console.log("res from recent", response.data);
-
-        })
-        .catch((error) => console.log(error));
+      dispatch(getRecentProjects(FullName))
     } else {
       console.log("no data");
     }
   };
-  const handleEditEstimate = async (_id) => {
-    console.log(_id);
-  }
 
   const handleSearchInputChange = (event) => {
     setInputSearch(event.target.value);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      await userData()
-      let key = localStorage.getItem("roleName");
-      let user = localStorage.getItem("user");
-
-      if (key === 'manager') {
-        axios
-          .get(`http://localhost:5000/api/projects/?prepared_by=${user}`)
-          .then((response) => {
-            setProjList(response.data)
-          })
-          .catch((error) => console.log(error))
-          .finally(setIsLoading(false));
-      } else if (key === 'resource') {
-        var userName = localStorage.getItem("username");
-        axios
-          .get(`http://localhost:5000/api/projects/resource/?resource_name=${userName}`)
-          .then((response) => {
-            setProjList(response.data)
-            console.log("Get projects by resource name", response.data);
-          })
-          .catch((error) => console.log(error))
-          .finally(setIsLoading(false));
-      } else {
-        console.log('no projects found');
-      }
-    }
-    fetchData()
-  }, []);
+    dispatch(getRole(username))
+    dispatch(getNotifications(username))
+  }, [])
 
   useEffect(() => {
+    const fetchData = () => {
+
+      if (role === 'manager') {
+        dispatch(getProjectsByManager(FullName))
+      }
+      else if (role === 'resource') {
+        dispatch(getProjectsByResource(username))
+      }
+      else {
+        console.log("No Projects Found");
+      }
+
+    }
+    fetchData()
+  }, [role, username, FullName, dispatch]);
+
+  // Projects Search
+  useEffect(() => {
     if (inputSearch === '') {
-      setSearchResults(projList);
+      setSearchResults(projects);
     } else {
-      const results = projList.filter((item) =>
+      const results = projects.filter((item) =>
         item.proj_name.toLowerCase().includes(inputSearch.toLowerCase())
       );
       setSearchResults(results);
     }
-  }, [inputSearch, projList]);
+  }, [inputSearch, projects]);
+
+  useEffect(() => {
+    dispatch(getRole(username))
+    dispatch(getNotifications(username))
+  }, [])
 
   return (
     <>
       <div className="nb-estimatesHistory-wrapper">
+        {/* Header */}
         <div className="nb-estimatesHistory-header">
           <div className="main-title">
             <h5>ESTIMATES</h5>
@@ -128,8 +103,9 @@ const EstimatesHistory = () => {
                 className="search-input"
                 onChange={handleSearchInputChange}
               />
-              <img src={SearchIcon} alt="search" onClick={handleChange} />
+              <img src={SearchIcon} alt="search" />
             </div>
+
             <div className="sort-box">
               {/* sort data */}
               <select
@@ -146,36 +122,35 @@ const EstimatesHistory = () => {
             </div>
           </div>
         </div>
-        {isLoading ? (
+
+        {loading ? (
           <div className="circular-progress">
             <CircularProgress />
           </div>
         ) : (
-          searchResults.map((p, index) => (
-            <div className="nb-estimatesHistory-content" key={p._id}>
+          searchResults.map((project, index) => (
+            <div className="nb-estimatesHistory-content" key={project._id}>
               <div className="calender-wrapper">
                 <div className="date-box">
-                  {/* {console.log("proj", p)} */}
 
-                  <span>{moment(p?.created_date).format("DD")}</span>
+                  <span>{moment(project?.created_date).format("DD")}</span>
                 </div>
                 <div className="monthYear-box">
-                  <span>{moment(p?.created_date).format("MMM YY")}</span>
+                  <span>{moment(project?.created_date).format("MMM YY")}</span>
                 </div>
               </div>
               <div className="project-meta">
                 <span>PROPOSAL FOR</span>
-                {/* <h5 key={p._id} onClick={() => handleEditEstimate(p._id)}>{p.proj_name}</h5> */}
                 <h5>
-                  <Link to={`/timeline/${p._id}`}>
-                    {p.proj_name}
+                  <Link to={`/timeline/${project._id}`}>
+                    {project?.proj_name}
                   </Link>
                 </h5>
                 <span>PREPARED BY</span>
-                <p>{p.prepared_by}</p>
+                <p>{project?.prepared_by}</p>
               </div>
               <div className="prog-lang">
-                {p.proj_tags.map((tag, index) => {
+                {project?.proj_tags.map((tag, index) => {
                   return (
                     <div className="lang-box" key={index}>
                       <span>{tag}</span>
@@ -184,8 +159,8 @@ const EstimatesHistory = () => {
                 })}
               </div>
               <div className="proj-status">
-                <div className="status-box" key={p._id}>
-                  <span>{p.proj_status}</span>
+                <div className="status-box" key={project._id}>
+                  <span>{project?.proj_status}</span>
                 </div>
               </div>
             </div>

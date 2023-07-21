@@ -9,12 +9,13 @@ const Statuses = () => {
   const [pendingNCount, setPendingNCount] = useState([]);
   const [draftNCount, setDraftNCount] = useState([]);
   // const URL = process.env.REACT_APP_SERVER_URL;
-  const comp = "http://localhost:5000/api/projects/comp";
-  const pending = "http://localhost:5000/api/projects/pending";
-  const draft = "http://localhost:5000/api/projects/draft";
-  const Ncomp = "http://localhost:5000/api/projects/Ncomp";
-  const Npending = "http://localhost:5000/api/projects/Npending";
-  const Ndraft = "http://localhost:5000/api/projects/Ndraft";
+  const backendURL = "http://localhost:5000";
+  const comp = `${backendURL}/api/projects/comp`;
+  const pending = `${backendURL}/api/projects/pending`;
+  const draft = `${backendURL}/api/projects/draft`;
+  const Ncomp = `${backendURL}/api/projects/Ncomp`;
+  const Npending = `${backendURL}/api/projects/Npending`;
+  const Ndraft = `${backendURL}/api/projects/Ndraft`;
   useEffect(() => {
 
     axios.get(comp)
