@@ -43,6 +43,7 @@ const Topbar = ({ estimate = false }) => {
     }
     return initials;
   };
+  
   var profileName = getInitials(key);
   var roleKey = localStorage.getItem("roleName");
 
@@ -75,7 +76,7 @@ const Topbar = ({ estimate = false }) => {
           }
           {/* {limitRole ?
             (
-               <span>hellloooooo</span>
+              <span>hellloooooo</span>
             ) : (
               <span>byeee</span>
             )

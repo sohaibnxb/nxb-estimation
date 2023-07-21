@@ -171,6 +171,8 @@ const getAllProjectByStatusNC = (req, res) => {
     });
 };
 // get all projects whose status have pending of specific template i.e. vteams
+
+
 const getAllProjectByStatusNP = (req, res) => {
   Project.find({
     proj_status: "Pending for Review",
@@ -270,7 +272,7 @@ const updateProjectByTemp = (req, res) => {
       console.log(err);
     });
 };
-//search project on the bais of project tags or project name
+//search project on the bais of project tags or project name 02 
 const searchProjectsByTags = (req, res) => {
   Project.find({
     $or: [

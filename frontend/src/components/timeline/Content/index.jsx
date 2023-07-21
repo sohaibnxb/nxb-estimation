@@ -3,20 +3,24 @@ import { Button, Card, CardContent } from "@mui/material";
 import SelectIcon from "../../../assets/images/select.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify';
 import TableRows from "./TableRows";
-import TableDataRows from "./TableDataRows";
 
+import { getProjectDetails, getProjectDeliverables } from "../redux/timelineActions";
 
 const Timelinecontent = () => {
   const navigate = useNavigate();
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
-  const [projDetails, setProjectDetails] = useState([]);
   const [rowsData, setRowsData] = useState([]);
   const [rowsExtraData, setRowsExtraData] = useState([]);
   const [showRow, setShowRow] = useState(false);
   const [showExtraRow, setShowExtraRow] = useState(true);
   const { id } = useParams();
+  const dispatch = useDispatch();
+
+  const { project, projectDeliverables } = useSelector(state => state.timeline)
+
   // add new rows
   const addTableRows = () => {
     const rowsInput = {
@@ -192,9 +196,10 @@ const Timelinecontent = () => {
     //   });
   }
   // total sum
-  var totalHours = rowsData.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
+  var totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
   // select option
   estimatedMode.map((estimateOption) => estimateOption);
+
   const handleOptionChange = (e) => {
     var selectedOption = estimatedMode[e.target.value];
     console.log("selectedOption", selectedOption);
@@ -202,48 +207,53 @@ const Timelinecontent = () => {
       console.log(selectedOption);
     }
   };
+
   function navigatePage() {
     console.log('navigate hours', totalHours)
-    if (rowsData != "") {
+    if (rowsData !== "") {
       return navigate("/costing", { state: totalHours });
 
     } else {
       alert("please fill the estimate");
     }
   }
+
   function navigatePageD() {
     return navigate("/dashboard");
   }
   // Api
   useEffect(() => {
     console.log(id);
-    axios
-      .get(`http://localhost:5000/api/projects/${id}`)
-      .then((res) => {
-        setProjectDetails([res.data]);
-        console.log([res.data.proj_name]);
-        localStorage.setItem("projName", res.data.proj_name);
-        localStorage.setItem("projId", res.data._id);
-        //console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // axios
+    //   .get(`http://localhost:5000/api/projects/${id}`)
+    //   .then((res) => {
+    //     setProjectDetails([res.data]);
+    //     console.log([res.data.proj_name]);
+    //     localStorage.setItem("projName", res.data.proj_name);
+    //     localStorage.setItem("projId", res.data._id);
+    //     //console.log(res.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    dispatch(getProjectDetails(id))
+    // debugger
     // if timeline is already done then import data
-    const data = axios
+    const projectScreens = axios
       .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
       .then((response) => {
-        console.log(response.data);
-        if (response.data.screens?.length > 0) {
-          setRowsData(response.data.screens);
-        }
-
+        setRowsData(response.data.screens)
       })
       .catch((error) => {
         console.log(error);
       });
 
+    localStorage.setItem("projName", project?.proj_name);
+    localStorage.setItem("projId", project?._id);
+
   }, [id]);
+
 
   return (
     <>
@@ -261,11 +271,7 @@ const Timelinecontent = () => {
                 <table className="table estimation-table">
                   <thead>
                     <tr>
-                      {Array.isArray(projDetails)
-                        ? projDetails.map((elem, index) => {
-                          return <th key={elem._id}> {elem.proj_type} </th>;
-                        })
-                        : null}
+                      <th>{project?.proj_type}</th>
                       <th>
                         <div className="assign-selectbox select-timeMode">
                           <select
@@ -357,23 +363,17 @@ const Timelinecontent = () => {
               <Card className="card-padding">
                 <CardContent>
                   <ul className="expertise">
-                    {Array.isArray(projDetails)
-                      ? projDetails.map((elem, index) => {
-                        return (
-                          <li className="active" key={elem._id}>
-                            {elem.proj_name}
-                            <div className="action-btns">
-                              <span>
-                                <i className="fas fa-edit"></i>
-                              </span>
-                              <span>
-                                <i className="fas fa-times"></i>
-                              </span>
-                            </div>
-                          </li>
-                        );
-                      })
-                      : null}
+                    <li className="active">
+                      {project?.proj_name}
+                      <div className="action-btns">
+                        <span>
+                          <i className="fas fa-edit"></i>
+                        </span>
+                        <span>
+                          <i className="fas fa-times"></i>
+                        </span>
+                      </div>
+                    </li>
                   </ul>
                   <div className="add-button">
                     <svg

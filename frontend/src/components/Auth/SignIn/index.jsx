@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
+import { userLogin } from "./redux/authActions";
 import { useFormik } from "formik";
 import { toast } from 'react-toastify';
 import {
@@ -15,20 +17,30 @@ import "./Style.scss";
 // images
 import illustration from "../../../assets/images/side-img.png";
 import Logo from "../../../assets/images/nxb-logo.png";
-import { loginUser } from "./services";
+// import { userLogin } from "./services";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { loading, userInfo, error } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
   const initialValues = {
     username: "",
     password: "",
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/dashboard')
+    }
+  }, [navigate, userInfo])
+
   const onSubmit = async (values) => {
     console.log(values);
-    const username = values.username;
-    const password = values.password;
-    await loginUser(username, password, navigate);
+    // const { username, password } = values;
+    // await userLogin(username, password, navigate);
+    dispatch(userLogin(values))
   };
+
   const validate = (values) => {
     let errors = {};
     if (!values.username) {
@@ -43,12 +55,13 @@ const SignIn = () => {
     }
     return errors;
   };
+
   const formik = useFormik({
     initialValues,
     onSubmit,
     validate,
   });
-  
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
