@@ -21,6 +21,7 @@ import Logo from "../../../assets/images/nxb-logo.png";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const userToken = localStorage.getItem("access-token")
   const { loading, userInfo, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const initialValues = {
@@ -29,10 +30,10 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userToken) {
       navigate('/dashboard')
     }
-  }, [navigate, userInfo])
+  }, [navigate, userInfo, userToken])
 
   const onSubmit = async (values) => {
     console.log(values);

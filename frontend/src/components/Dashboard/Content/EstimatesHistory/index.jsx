@@ -15,9 +15,9 @@ const EstimatesHistory = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
 
-  const userToken = useSelector(state => state.auth.userToken)
+  const userToken = localStorage.getItem("access-token")
   const { projects, notifications, role, loading } = useSelector(state => state.dashboard)
-  
+
   const { username, FullName } = jwt(userToken);
 
 

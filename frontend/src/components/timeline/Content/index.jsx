@@ -18,8 +18,10 @@ const Timelinecontent = () => {
   const [showExtraRow, setShowExtraRow] = useState(true);
   const { id } = useParams();
   const dispatch = useDispatch();
-
   const { project, projectDeliverables } = useSelector(state => state.timeline)
+  const { username, managerName } = useSelector(state => state.auth.userInfo)
+  const { role } = useSelector(state => state.dashboard)
+
 
   // add new rows
   const addTableRows = () => {
@@ -41,7 +43,10 @@ const Timelinecontent = () => {
   const deleteTableRows = (index) => {
     const rows = [...rowsData];
     rows.splice(index, 1);
-    setRowsData(rows);
+    if (rows.length === 0) {
+      setShowRow(false);
+    }
+    setRowsData(rows)
   };
   //delete sub rows
   const deleteTableExtraRows = (mainIndex, subIndex) => {
@@ -68,17 +73,7 @@ const Timelinecontent = () => {
   async function addScreenNotify() {
     console.log(rowsData, 'addScreenNotifyfunction');
     if (rowsData) {
-      // let projectEstimationExist;
-      // axios
-      //   .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
-      //   .then((response) => {
-      //     console.log('id data', response );
-      //     projectEstimationExist = response.data
-      //   })
-      //   .catch((error) => {
-      //     console.log("check projectEstimationExist",error);
-      //   });
-      // console.log("projectEstimationExist", projectEstimationExist);
+
       const projectEstimation = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
         .then((response) => {
           console.log(response.data);
@@ -88,9 +83,8 @@ const Timelinecontent = () => {
           console.log(error);
         });
       console.log("projectEstimation", projectEstimation);
-      debugger
-      if (projectEstimation == "") {
 
+      if (projectEstimation === '') {
         await toast.promise(axios.post(`http://localhost:5000/api/screens/${id}`, { rowsData }), {
           pending: 'Creating new screen',
           success: 'New Screen created successfully',
@@ -102,10 +96,8 @@ const Timelinecontent = () => {
           .catch((error) => {
             console.log(error);
           });
-        // alert("if");
       }
       else {
-        debugger
         await toast.promise(axios.put(`http://localhost:5000/api/screens/${id}`, {
           project_id: id,
           screens: rowsData,
@@ -116,20 +108,17 @@ const Timelinecontent = () => {
         })
           .then((response) => {
             console.log(response.data);
-            debugger
           })
           .catch((error) => {
             console.log(error);
           });
-        // alert("else");
       }
-      debugger
       // Notification send it to manager
-      var key = localStorage.getItem("username");
-      var projKey = localStorage.getItem("projName");
-      var managerKey = localStorage.getItem("managerName");
+      // var key = localStorage.getItem("username");
+      // var projKey = localStorage.getItem("projName");
+      // var managerKey = localStorage.getItem("managerName");
       await toast.promise(axios.post(
-        `http://localhost:5000/api/notifications/?senderName=${key}&receiptName=${managerKey}&projectName=${projKey}&read=false&count=1`
+        `http://localhost:5000/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
       ), {
         pending: 'Sending notification',
         success: 'Notification sent successfully to your manager',
@@ -141,11 +130,10 @@ const Timelinecontent = () => {
         .catch((error) => {
           console.log(error);
         });
-      debugger
       //receiptant read notification
-      const projN = localStorage.getItem("projName");
-      axios
-        .put(`http://localhost:5000/api/notifications/?projectName=${projN}`, {
+      // const projN = localStorage.getItem("projName");
+      await axios
+        .put(`http://localhost:5000/api/notifications/?projectName=${project?.proj_name}`, {
           read: true,
         })
         .then((res) => {
@@ -154,9 +142,8 @@ const Timelinecontent = () => {
         .catch((error) => {
           console.log(error);
         });
-      debugger
       // project status change
-      axios
+      await axios
         .put(`http://localhost:5000/api/projects/?_id=${id}`, {
           proj_status: "Ready for Review",
         })
@@ -243,14 +230,16 @@ const Timelinecontent = () => {
     const projectScreens = axios
       .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
       .then((response) => {
-        setRowsData(response.data.screens)
+        if (response.data) {
+          setRowsData(response.data.screens)
+        }
       })
       .catch((error) => {
         console.log(error);
       });
 
-    localStorage.setItem("projName", project?.proj_name);
-    localStorage.setItem("projId", project?._id);
+    // localStorage.setItem("projName", project?.proj_name);
+    // localStorage.setItem("projId", project?._id);
 
   }, [id]);
 
@@ -292,7 +281,10 @@ const Timelinecontent = () => {
                       <th></th>
                     </tr>
                   </thead>
-                  {rowsData == "" ? (
+                  {
+                    console.log("rowsData", rowsData)
+                  }
+                  {rowsData.length === 0 ? (
                     <tbody>
                       {showRow ? (
                         " "
@@ -315,7 +307,7 @@ const Timelinecontent = () => {
                       {showRow ? (
                         <>
                           <tr className="totalRow">
-                            <td>Total</td>
+                            <td>Total showrow</td>
                             <td>{totalHours}</td>
                             <td></td>
                           </tr>
@@ -442,7 +434,7 @@ const Timelinecontent = () => {
             >
               Save As Draft
             </Button>
-            {localStorage.getItem("roleName") === "manager" ? (
+            {role === "manager" ? (
               <Button
                 type="sumit"
                 onClick={() => {
