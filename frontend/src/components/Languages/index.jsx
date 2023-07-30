@@ -15,6 +15,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ReactPDF, { PDFDownloadLink, PDFViewer, BlobProvider } from '@react-pdf/renderer';
 import ReactPdf from "../ReactPdf/ReactPdf";
 import "./style.scss";
+import { useSelector } from "react-redux";
 
 const DropdownIndicator = (props) => {
   return (
@@ -31,10 +32,13 @@ const Languages = () => {
   const [vteam, setVteam] = useState('6395ded86d71e15926fbbdc1');
   const [nxb, setNxb] = useState('6395df75a9038f587df95185');
   const [generatePdf, setGeneratePdf] = useState(false)
-  const [project, setProject] = useState(null)
+  // const [project, setProject] = useState(null)
   const [isReady, setIsReady] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const previewDropDownRef = useRef(null)
+  const { project } = useSelector(state => state.timeline)
+
+
   const options = [
     { value: "PHP", label: "PHP" },
     { value: "HTML5", label: "HTML5" },
@@ -51,6 +55,7 @@ const Languages = () => {
     { value: "BA", label: "BA" },
     { value: "Python", label: "Python" },
   ];
+
   const handleMessageChange = event => {
     setMessage(event.target.value);
     setGeneratePdf(false);
@@ -64,24 +69,24 @@ const Languages = () => {
   async function addTagsAndTerms() {
     let getValue = selectedOption.map(function (s) {
       return s["value"];
-    }); 
-    var projName = localStorage.getItem("projName");
-    console.log(projName);
+    });
+    // var projName = localStorage.getItem("projName");
+    // console.log(projName);
     console.log("getValue", getValue);
     //  await data(getValue, projName);
 
     // Set languages
     await axios
       .put("http://localhost:5000/api/projects/tags", {
-        proj_name: projName,
+        proj_name: project?.proj_name,
         proj_tags: getValue,
       })
       .then((response) => {
         console.log(response.data);
-        setProject(response.data)
+        // setProject(response.data)
         setGeneratePdf(true)
       })
-      .catch((error) => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+      .catch((error) => {
         console.log(error);
         console.log("error form terms");
       });
@@ -90,7 +95,7 @@ const Languages = () => {
     // Set Notes
     await axios
       .put("http://localhost:5000/api/projects/terms", {
-        proj_name: projName,
+        proj_name: project?.proj_name,
         terms_conditions: message
       })
       .then((response) => {
@@ -100,14 +105,14 @@ const Languages = () => {
         console.log(error);
       });
   }
+
   async function AddVteamTemp() {
     await addTagsAndTerms();
-    var projName = localStorage.getItem("projName");
     // vteams template
     try {
       const response = await axios
         .put("http://localhost:5000/api/projects/temp", {
-          proj_name: projName,
+          proj_name: project?.proj_name,
           temp_id: vteam,
         })
       console.log(response.data);
@@ -127,11 +132,11 @@ const Languages = () => {
 
   async function AddNxbTemp() {
     await addTagsAndTerms();
-    var projName = localStorage.getItem("projName");
+    // var projName = localStorage.getItem("projName");
     // vteams template
     axios
       .put("http://localhost:5000/api/projects/temp", {
-        proj_name: projName,
+        proj_name: project?.proj_name,
         temp_id: nxb,
       })
       .then((response) => {
@@ -142,9 +147,9 @@ const Languages = () => {
         console.log(error);
       });
   }
+
+  // Close dropdown on clicking outside of dropdown
   useEffect(() => {
-
-
     const handleClickOutside = (event) => {
       if (previewDropDownRef.current && !previewDropDownRef.current.contains(event.target)) {
         setIsDropDownOpen(false);
@@ -163,7 +168,9 @@ const Languages = () => {
   return (
     <>
       <Topbar estimate={false} limiteRole={false} />
+
       <ProgressBar steps={4} />
+
       <form onSubmit={(e) => e.preventDefault()}>
         <Card className="languages-card">
           <div>
@@ -180,9 +187,9 @@ const Languages = () => {
               }}
             />
           </div>
+
           <div>
             <h2 className="languages-title"> Important Notes</h2>
-
             <textarea
               id="message"
               name="message"
@@ -196,16 +203,15 @@ const Languages = () => {
             </textarea>
           </div>
         </Card>
+
         <div className="estimate-btns-container">
           <Button
             variant="contained"
             className="secondary-btn estimate-nav-btn"
             onClick={() => navigate(-1)}
-
           >
             Back
           </Button>
-
 
           <Button
             variant="contained"
@@ -216,7 +222,7 @@ const Languages = () => {
             <SaveIcon sx={{ marginRight: 1 }} />
             Save Estimate
           </Button>
-
+          {/* dropdown button */}
           <div className="preview-dropdown" ref={previewDropDownRef}>
             {
               generatePdf &&
@@ -229,9 +235,10 @@ const Languages = () => {
                 <KeyboardArrowDownIcon sx={{ alignSelf: 'center', position: 'absolute', right: 8 }} />
               </Button>
             }
+            {/* dropdown menu */}
             <ul className={`preview-dropdown-menu ${isDropDownOpen ? 'show' : ''}`}>
               <li className="preview-dropdown-item" onClick={toggleDropdown}>
-                <BlobProvider document={generatePdf && <ReactPdf />}>
+                <BlobProvider document={generatePdf && <ReactPdf projId={project?._id} projName={project?.proj_name} />}>
                   {({ url, loading }) => (
                     <a href={url} target="_blank" rel="noreferrer">
                       {loading ? 'Generatiing Preview...' : 'Vteams'}
@@ -241,7 +248,7 @@ const Languages = () => {
                 </BlobProvider>
               </li>
               <li className="preview-dropdown-item" onClick={toggleDropdown}>
-                <BlobProvider document={generatePdf && <ReactPdf />}>
+                <BlobProvider document={generatePdf && <ReactPdf projId={project?._id} projName={project?.proj_name} />}>
                   {({ url, loading }) => (
                     <a href={url} target="_blank" rel="noreferrer">
                       {loading ? 'Generatiing Preview...' : 'Nextbridge'}
@@ -255,6 +262,7 @@ const Languages = () => {
 
         </div>
       </form >
+
       <Footer />
     </>
   );

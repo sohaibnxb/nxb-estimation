@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import SignIn from "./components/Auth/SignIn";
 import CreateEstimation from "./components/CreateEstimation";
@@ -9,11 +9,11 @@ import Timeline from "./components/timeline";
 
 import jwt from 'jwt-decode'
 
-
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //css
 import "./index.scss";
+import { useDispatch, useSelector } from "react-redux";
 function App() {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const checkUserToken = () => {
@@ -29,17 +29,27 @@ function App() {
   //   checkUserToken();
   // }, [isLoggedIn]);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const userToken = localStorage.getItem("access-token")
+  const { loading, userInfo, error } = useSelector((state) => state.auth)
+  const initialValues = {
+    username: "",
+    password: "",
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    if (token) {
-      const user = jwt(token);
-      
+    if (userInfo && userToken) {
+      navigate('/dashboard')
     }
   }, [])
+
   return (
     <>
       <Routes>
-        <Route path="/" element={<SignIn />}></Route>
+        {(userInfo && userToken)
+        }
+
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/new" element={<CreateEstimation />}></Route>
         <Route path="/costing" element={<Costing />}></Route>

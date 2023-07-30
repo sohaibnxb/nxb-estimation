@@ -1,10 +1,11 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
 import ProgressBar from "../common/ProgressBar";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from 'react-toastify';
-import axios from 'axios';
 import {
   FormControl,
   TextField,
@@ -15,20 +16,21 @@ import {
 import { useFormik } from "formik";
 
 import "./Style.scss";
-//import { postCosting } from "./services";
 
 const Costing = () => {
 
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { project } = useSelector(state => state.timeline)
+
   const formik = useFormik({
     initialValues: {
       hours: " ",
     },
     onSubmit: async (values) => {
       const hours = parseInt(values.hours);
-      var projName = localStorage.getItem('projName');
-      var totalcost = hours * state;
+      let projName = project?.proj_name;
+      let totalcost = hours * state;
       let payload = { projName, hours, state, totalcost };
       const projectCostExist = await axios.get(`http://localhost:5000/api/costing/project?projectName=${projName}`)
         .then((response) => {
@@ -54,9 +56,9 @@ const Costing = () => {
           .catch((error) => {
             console.log(error);
           });
-      } else {
+      }
+      else {
         debugger
-        var projName = localStorage.getItem('projName');
         const putReq = await toast.promise(
           axios.put("http://localhost:5000/api/costing/id", {
             projectName: projName,
@@ -106,7 +108,7 @@ const Costing = () => {
               <th className="br-0">Cost</th>
             </tr>
             <tr>
-              <td>{localStorage.getItem("projName")}</td>
+              <td>{project?.proj_name}</td>
               <td>
                 <FormControl>
                   <TextField

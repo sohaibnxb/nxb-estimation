@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom"
+import { useDispatch, useSelector } from 'react-redux';
+import jwt from "jwt-decode"
 import { Button, Tooltip, IconButton, Avatar, Typography, Menu, MenuItem } from '@mui/material'
 // images
 import Notifi from "../../../assets/images/notifi.png";
@@ -17,43 +19,39 @@ const Topbar = ({ estimate = false }) => {
     setAnchorEl(null);
   };
 
-  // const [elem, setelem] = React.useState(null);
-  // const handleProfile = (event) => {
-  //   setelem(event.currentTarget);
-  // };
-  // const handleClose = () => {
-  //   setelem(null);
-  // };
-  // const open = Boolean(elem);
+  const userToken = localStorage.getItem('access-token');
+  const { role } = useSelector(state => state.dashboard)
+  const { username, FullName } = jwt(userToken);
+
+
+
   const removeToken = () => {
     localStorage.removeItem("access-token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("roleName");
-    localStorage.removeItem("username");
+    // localStorage.removeItem("user");
+    // localStorage.removeItem("roleName");
+    // localStorage.removeItem("username");
     navigate("/");
   };
-  var key = localStorage.getItem("user");
   // getting initials
-  var getInitials = function (string) {
-    var names = string.split(' '),
-      initials = names[0].substring(0, 1).toUpperCase();
+  let getInitials = function (string) {
+    let names = string?.split(' '),
+      initials = names[0]?.substring(0, 1)?.toUpperCase();
 
     if (names.length > 1) {
       initials += names[names.length - 1].substring(0, 1).toUpperCase();
     }
     return initials;
   };
-  
-  var profileName = getInitials(key);
-  var roleKey = localStorage.getItem("roleName");
+
+  let profileName = getInitials(FullName);
 
   useEffect(() => {
-    if (roleKey == 'resource') {
+    if (role == 'resource') {
       setLimitRole(false);
     } else {
       setLimitRole(true);
     }
-  })
+  }, [])
 
   return (
     <>
@@ -74,22 +72,9 @@ const Topbar = ({ estimate = false }) => {
               </div>
             ) : ' '
           }
-          {/* {limitRole ?
-            (
-              <span>hellloooooo</span>
-            ) : (
-              <span>byeee</span>
-            )
-          } */}
 
         </div>
         <div className="nb-left-container">
-          {/* <div className='nb-notifi-wrapper'>
-                <img src={Notifi} alt="notification"/>
-            </div> */}
-          {/* <div className='nb-profile-wrapper' onClick={handleClick}>
-            {profileName}
-          </div> */}
           <Tooltip title="Profile">
             <IconButton
               onClick={handleClick}

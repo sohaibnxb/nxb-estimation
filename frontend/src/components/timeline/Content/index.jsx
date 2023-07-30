@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, CardContent } from "@mui/material";
+import { Button, Card, CardContent, CircularProgress } from "@mui/material";
 import SelectIcon from "../../../assets/images/select.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify';
 import TableRows from "./TableRows";
 
-import { getProjectDetails, getProjectDeliverables } from "../redux/timelineActions";
+import { getProjectDetails } from "../redux/timelineActions";
 
 const Timelinecontent = () => {
   const navigate = useNavigate();
@@ -16,10 +16,13 @@ const Timelinecontent = () => {
   const [rowsExtraData, setRowsExtraData] = useState([]);
   const [showRow, setShowRow] = useState(false);
   const [showExtraRow, setShowExtraRow] = useState(true);
+  const [loading, setLoading] = useState(false)
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { project } = useSelector(state => state.timeline)
+  const { username, managerName } = useSelector(state => state.auth.userInfo)
+  const { role } = useSelector(state => state.dashboard)
 
-  const { project, projectDeliverables } = useSelector(state => state.timeline)
 
   // add new rows
   const addTableRows = () => {
@@ -41,7 +44,10 @@ const Timelinecontent = () => {
   const deleteTableRows = (index) => {
     const rows = [...rowsData];
     rows.splice(index, 1);
-    setRowsData(rows);
+    if (rows.length === 0) {
+      setShowRow(false);
+    }
+    setRowsData(rows)
   };
   //delete sub rows
   const deleteTableExtraRows = (mainIndex, subIndex) => {
@@ -68,17 +74,7 @@ const Timelinecontent = () => {
   async function addScreenNotify() {
     console.log(rowsData, 'addScreenNotifyfunction');
     if (rowsData) {
-      // let projectEstimationExist;
-      // axios
-      //   .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
-      //   .then((response) => {
-      //     console.log('id data', response );
-      //     projectEstimationExist = response.data
-      //   })
-      //   .catch((error) => {
-      //     console.log("check projectEstimationExist",error);
-      //   });
-      // console.log("projectEstimationExist", projectEstimationExist);
+
       const projectEstimation = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
         .then((response) => {
           console.log(response.data);
@@ -88,9 +84,8 @@ const Timelinecontent = () => {
           console.log(error);
         });
       console.log("projectEstimation", projectEstimation);
-      debugger
-      if (projectEstimation == "") {
 
+      if (projectEstimation === '') {
         await toast.promise(axios.post(`http://localhost:5000/api/screens/${id}`, { rowsData }), {
           pending: 'Creating new screen',
           success: 'New Screen created successfully',
@@ -102,10 +97,8 @@ const Timelinecontent = () => {
           .catch((error) => {
             console.log(error);
           });
-        // alert("if");
       }
       else {
-        debugger
         await toast.promise(axios.put(`http://localhost:5000/api/screens/${id}`, {
           project_id: id,
           screens: rowsData,
@@ -116,20 +109,17 @@ const Timelinecontent = () => {
         })
           .then((response) => {
             console.log(response.data);
-            debugger
           })
           .catch((error) => {
             console.log(error);
           });
-        // alert("else");
       }
-      debugger
       // Notification send it to manager
-      var key = localStorage.getItem("username");
-      var projKey = localStorage.getItem("projName");
-      var managerKey = localStorage.getItem("managerName");
+      // var key = localStorage.getItem("username");
+      // var projKey = localStorage.getItem("projName");
+      // var managerKey = localStorage.getItem("managerName");
       await toast.promise(axios.post(
-        `http://localhost:5000/api/notifications/?senderName=${key}&receiptName=${managerKey}&projectName=${projKey}&read=false&count=1`
+        `http://localhost:5000/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
       ), {
         pending: 'Sending notification',
         success: 'Notification sent successfully to your manager',
@@ -141,11 +131,10 @@ const Timelinecontent = () => {
         .catch((error) => {
           console.log(error);
         });
-      debugger
       //receiptant read notification
-      const projN = localStorage.getItem("projName");
-      axios
-        .put(`http://localhost:5000/api/notifications/?projectName=${projN}`, {
+      // const projN = localStorage.getItem("projName");
+      await axios
+        .put(`http://localhost:5000/api/notifications/?projectName=${project?.proj_name}`, {
           read: true,
         })
         .then((res) => {
@@ -154,9 +143,8 @@ const Timelinecontent = () => {
         .catch((error) => {
           console.log(error);
         });
-      debugger
       // project status change
-      axios
+      await axios
         .put(`http://localhost:5000/api/projects/?_id=${id}`, {
           proj_status: "Ready for Review",
         })
@@ -203,7 +191,7 @@ const Timelinecontent = () => {
   const handleOptionChange = (e) => {
     var selectedOption = estimatedMode[e.target.value];
     console.log("selectedOption", selectedOption);
-    if (selectedOption == "Hours") {
+    if (selectedOption === "Hours") {
       console.log(selectedOption);
     }
   };
@@ -240,17 +228,21 @@ const Timelinecontent = () => {
     dispatch(getProjectDetails(id))
     // debugger
     // if timeline is already done then import data
+    setLoading(true);
     const projectScreens = axios
       .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
       .then((response) => {
-        setRowsData(response.data.screens)
+        if (response.data) {
+          setRowsData(response.data.screens)
+        }
+        setLoading(false)
       })
       .catch((error) => {
         console.log(error);
       });
 
-    localStorage.setItem("projName", project?.proj_name);
-    localStorage.setItem("projId", project?._id);
+    // localStorage.setItem("projName", project?.proj_name);
+    // localStorage.setItem("projId", project?._id);
 
   }, [id]);
 
@@ -258,105 +250,117 @@ const Timelinecontent = () => {
   return (
     <>
       <section className="nb-section">
+
         <form onSubmit={(event) => event.preventDefault()}>
           <div className="nb-dashboard-title text-center">
             <p>
               The modules below are created as per your requirements. Please
               review following modules and timeline.
             </p>
-          </div>
+          </div >
           <div className="main_content">
             <div className="main_content--left">
-              <div className="nb-innertimeline-wrapper">
-                <table className="table estimation-table">
-                  <thead>
-                    <tr>
-                      <th>{project?.proj_type}</th>
-                      <th>
-                        <div className="assign-selectbox select-timeMode">
-                          <select
-                            id="timeMode"
-                            name="users"
-                            className="assign-resources-selectbox est-timeMode-selectbox"
-                            onChange={(e) => handleOptionChange(e)}
-                          >
-                            {estimatedMode.map((option, key) => (
-                              <option key={key} value={key}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                          <img src={SelectIcon} alt="select" />
-                        </div>
-                      </th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  {rowsData == "" ? (
-                    <tbody>
-                      {showRow ? (
-                        " "
-                      ) : (
-                        <p onClick={addTableRows}>
-                          Type here and enter your estimate
-                        </p>
-                      )}
-                      <TableRows
-                        rowsData={rowsData}
-                        rowsExtraData={rowsExtraData}
-                        deleteTableRows={deleteTableRows}
-                        handleChange={handleChange}
-                        handleExtraChange={handleExtraChange}
-                        addSubRows={addSubRows}
-                        showExtraRow={showExtraRow}
-                        addTableRows={addTableRows}
-                        deleteTableExtraRows={deleteTableExtraRows}
-                      />
-                      {showRow ? (
-                        <>
-                          <tr className="totalRow">
-                            <td>Total</td>
-                            <td>{totalHours}</td>
-                            <td></td>
-                          </tr>
-                          <Button onClick={addTableRows} className="AddRow">
-                            Add new Row
-                          </Button>
-                        </>
-                      ) : (
-                        " "
-                      )}
-                    </tbody>
-                  ) : (
+              {loading ? (
+                <div className="circular-progress">
+                  < CircularProgress />
+                </div>
 
-                    <tbody>
-                      <TableRows
-                        rowsData={rowsData}
-                        rowsExtraData={rowsExtraData}
-                        deleteTableRows={deleteTableRows}
-                        handleChange={handleChange}
-                        handleExtraChange={handleExtraChange}
-                        addSubRows={addSubRows}
-                        showExtraRow={showExtraRow}
-                        addTableRows={addTableRows}
-                        deleteTableExtraRows={deleteTableExtraRows}
-                      />
-                      {
-                        <>
-                          <tr className="totalRow">
-                            <td>Total</td>
-                            <td>{totalHours}</td>
-                            <td></td>
-                          </tr>
-                          <Button onClick={addTableRows} className="AddRow">
-                            Add new Row
-                          </Button>
-                        </>
-                      }
-                    </tbody>
-                  )}
-                </table>
-              </div>
+              ) : (
+                <div className="nb-innertimeline-wrapper">
+                  <table className="table estimation-table">
+                    <thead>
+                      <tr>
+                        <th>{project?.proj_type}</th>
+                        <th>
+                          <div className="assign-selectbox select-timeMode">
+                            <select
+                              id="timeMode"
+                              name="users"
+                              className="assign-resources-selectbox est-timeMode-selectbox"
+                              onChange={(e) => handleOptionChange(e)}
+                            >
+                              {estimatedMode.map((option, key) => (
+                                <option key={key} value={key}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                            <img src={SelectIcon} alt="select" />
+                          </div>
+                        </th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    {
+                      console.log("rowsData", rowsData)
+                    }
+                    {rowsData.length === 0 ? (
+                      <tbody>
+                        {showRow ? (
+                          " "
+                        ) : (
+                          <p onClick={addTableRows}>
+                            Type here and enter your estimate
+                          </p>
+                        )}
+                        <TableRows
+                          rowsData={rowsData}
+                          rowsExtraData={rowsExtraData}
+                          deleteTableRows={deleteTableRows}
+                          handleChange={handleChange}
+                          handleExtraChange={handleExtraChange}
+                          addSubRows={addSubRows}
+                          showExtraRow={showExtraRow}
+                          addTableRows={addTableRows}
+                          deleteTableExtraRows={deleteTableExtraRows}
+                        />
+                        {showRow ? (
+                          <>
+                            <tr className="totalRow">
+                              <td>Total showrow</td>
+                              <td>{totalHours}</td>
+                              <td></td>
+                            </tr>
+                            <Button onClick={addTableRows} className="AddRow">
+                              Add new Row
+                            </Button>
+                          </>
+                        ) : (
+                          " "
+                        )}
+                      </tbody>
+                    ) : (
+
+                      <tbody>
+                        <TableRows
+                          rowsData={rowsData}
+                          rowsExtraData={rowsExtraData}
+                          deleteTableRows={deleteTableRows}
+                          handleChange={handleChange}
+                          handleExtraChange={handleExtraChange}
+                          addSubRows={addSubRows}
+                          showExtraRow={showExtraRow}
+                          addTableRows={addTableRows}
+                          deleteTableExtraRows={deleteTableExtraRows}
+                        />
+                        {
+                          <>
+                            <tr className="totalRow">
+                              <td>Total</td>
+                              <td>{totalHours}</td>
+                              <td></td>
+                            </tr>
+                            <Button onClick={addTableRows} className="AddRow">
+                              Add new Row
+                            </Button>
+                          </>
+                        }
+                      </tbody>
+                    )}
+                  </table>
+                </div>
+              )}
+
             </div>
 
             <div className="main_content--right">
@@ -442,7 +446,7 @@ const Timelinecontent = () => {
             >
               Save As Draft
             </Button>
-            {localStorage.getItem("roleName") === "manager" ? (
+            {role === "manager" ? (
               <Button
                 type="sumit"
                 onClick={() => {
@@ -468,8 +472,8 @@ const Timelinecontent = () => {
               </Button>
             )}
           </div>
-        </form>
-      </section>
+        </form >
+      </section >
     </>
   );
 };

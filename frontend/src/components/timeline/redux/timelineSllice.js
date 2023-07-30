@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { getProjectDetails, getProjectDeliverables } from './timelineActions'
+import { getProjectDetails } from './timelineActions'
 
 
 const initialState = {
@@ -21,18 +21,6 @@ const timelineSlice = createSlice(
                     state.project = action.payload
                 })
                 .addCase(getProjectDetails.rejected, (state, action) => {
-                    state.error = action.payload
-                })
-                // Project Deliverables
-                .addCase(getProjectDeliverables.pending, state => {
-                    state.loading = true
-                })
-                .addCase(getProjectDeliverables.fulfilled, (state, action) => {
-                    state.loading = false
-                    state.projectDeliverables = action.payload
-                })
-                .addCase(getProjectDeliverables.rejected, (state, action) => {
-                    state.loading = false
                     state.error = action.payload
                 })
         }
