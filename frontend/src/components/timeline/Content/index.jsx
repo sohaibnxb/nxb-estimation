@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, CardContent } from "@mui/material";
+import { Button, Card, CardContent, CircularProgress } from "@mui/material";
 import SelectIcon from "../../../assets/images/select.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify';
 import TableRows from "./TableRows";
 
-import { getProjectDetails, getProjectDeliverables } from "../redux/timelineActions";
+import { getProjectDetails } from "../redux/timelineActions";
 
 const Timelinecontent = () => {
   const navigate = useNavigate();
@@ -16,9 +16,10 @@ const Timelinecontent = () => {
   const [rowsExtraData, setRowsExtraData] = useState([]);
   const [showRow, setShowRow] = useState(false);
   const [showExtraRow, setShowExtraRow] = useState(true);
+  const [loading, setLoading] = useState(false)
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { project, projectDeliverables } = useSelector(state => state.timeline)
+  const { project } = useSelector(state => state.timeline)
   const { username, managerName } = useSelector(state => state.auth.userInfo)
   const { role } = useSelector(state => state.dashboard)
 
@@ -190,7 +191,7 @@ const Timelinecontent = () => {
   const handleOptionChange = (e) => {
     var selectedOption = estimatedMode[e.target.value];
     console.log("selectedOption", selectedOption);
-    if (selectedOption == "Hours") {
+    if (selectedOption === "Hours") {
       console.log(selectedOption);
     }
   };
@@ -227,12 +228,14 @@ const Timelinecontent = () => {
     dispatch(getProjectDetails(id))
     // debugger
     // if timeline is already done then import data
+    setLoading(true);
     const projectScreens = axios
       .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
       .then((response) => {
         if (response.data) {
           setRowsData(response.data.screens)
         }
+        setLoading(false)
       })
       .catch((error) => {
         console.log(error);
@@ -247,108 +250,117 @@ const Timelinecontent = () => {
   return (
     <>
       <section className="nb-section">
+
         <form onSubmit={(event) => event.preventDefault()}>
           <div className="nb-dashboard-title text-center">
             <p>
               The modules below are created as per your requirements. Please
               review following modules and timeline.
             </p>
-          </div>
+          </div >
           <div className="main_content">
             <div className="main_content--left">
-              <div className="nb-innertimeline-wrapper">
-                <table className="table estimation-table">
-                  <thead>
-                    <tr>
-                      <th>{project?.proj_type}</th>
-                      <th>
-                        <div className="assign-selectbox select-timeMode">
-                          <select
-                            id="timeMode"
-                            name="users"
-                            className="assign-resources-selectbox est-timeMode-selectbox"
-                            onChange={(e) => handleOptionChange(e)}
-                          >
-                            {estimatedMode.map((option, key) => (
-                              <option key={key} value={key}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                          <img src={SelectIcon} alt="select" />
-                        </div>
-                      </th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  {
-                    console.log("rowsData", rowsData)
-                  }
-                  {rowsData.length === 0 ? (
-                    <tbody>
-                      {showRow ? (
-                        " "
-                      ) : (
-                        <p onClick={addTableRows}>
-                          Type here and enter your estimate
-                        </p>
-                      )}
-                      <TableRows
-                        rowsData={rowsData}
-                        rowsExtraData={rowsExtraData}
-                        deleteTableRows={deleteTableRows}
-                        handleChange={handleChange}
-                        handleExtraChange={handleExtraChange}
-                        addSubRows={addSubRows}
-                        showExtraRow={showExtraRow}
-                        addTableRows={addTableRows}
-                        deleteTableExtraRows={deleteTableExtraRows}
-                      />
-                      {showRow ? (
-                        <>
-                          <tr className="totalRow">
-                            <td>Total showrow</td>
-                            <td>{totalHours}</td>
-                            <td></td>
-                          </tr>
-                          <Button onClick={addTableRows} className="AddRow">
-                            Add new Row
-                          </Button>
-                        </>
-                      ) : (
-                        " "
-                      )}
-                    </tbody>
-                  ) : (
+              {loading ? (
+                <div className="circular-progress">
+                  < CircularProgress />
+                </div>
 
-                    <tbody>
-                      <TableRows
-                        rowsData={rowsData}
-                        rowsExtraData={rowsExtraData}
-                        deleteTableRows={deleteTableRows}
-                        handleChange={handleChange}
-                        handleExtraChange={handleExtraChange}
-                        addSubRows={addSubRows}
-                        showExtraRow={showExtraRow}
-                        addTableRows={addTableRows}
-                        deleteTableExtraRows={deleteTableExtraRows}
-                      />
-                      {
-                        <>
-                          <tr className="totalRow">
-                            <td>Total</td>
-                            <td>{totalHours}</td>
-                            <td></td>
-                          </tr>
-                          <Button onClick={addTableRows} className="AddRow">
-                            Add new Row
-                          </Button>
-                        </>
-                      }
-                    </tbody>
-                  )}
-                </table>
-              </div>
+              ) : (
+                <div className="nb-innertimeline-wrapper">
+                  <table className="table estimation-table">
+                    <thead>
+                      <tr>
+                        <th>{project?.proj_type}</th>
+                        <th>
+                          <div className="assign-selectbox select-timeMode">
+                            <select
+                              id="timeMode"
+                              name="users"
+                              className="assign-resources-selectbox est-timeMode-selectbox"
+                              onChange={(e) => handleOptionChange(e)}
+                            >
+                              {estimatedMode.map((option, key) => (
+                                <option key={key} value={key}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                            <img src={SelectIcon} alt="select" />
+                          </div>
+                        </th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    {
+                      console.log("rowsData", rowsData)
+                    }
+                    {rowsData.length === 0 ? (
+                      <tbody>
+                        {showRow ? (
+                          " "
+                        ) : (
+                          <p onClick={addTableRows}>
+                            Type here and enter your estimate
+                          </p>
+                        )}
+                        <TableRows
+                          rowsData={rowsData}
+                          rowsExtraData={rowsExtraData}
+                          deleteTableRows={deleteTableRows}
+                          handleChange={handleChange}
+                          handleExtraChange={handleExtraChange}
+                          addSubRows={addSubRows}
+                          showExtraRow={showExtraRow}
+                          addTableRows={addTableRows}
+                          deleteTableExtraRows={deleteTableExtraRows}
+                        />
+                        {showRow ? (
+                          <>
+                            <tr className="totalRow">
+                              <td>Total showrow</td>
+                              <td>{totalHours}</td>
+                              <td></td>
+                            </tr>
+                            <Button onClick={addTableRows} className="AddRow">
+                              Add new Row
+                            </Button>
+                          </>
+                        ) : (
+                          " "
+                        )}
+                      </tbody>
+                    ) : (
+
+                      <tbody>
+                        <TableRows
+                          rowsData={rowsData}
+                          rowsExtraData={rowsExtraData}
+                          deleteTableRows={deleteTableRows}
+                          handleChange={handleChange}
+                          handleExtraChange={handleExtraChange}
+                          addSubRows={addSubRows}
+                          showExtraRow={showExtraRow}
+                          addTableRows={addTableRows}
+                          deleteTableExtraRows={deleteTableExtraRows}
+                        />
+                        {
+                          <>
+                            <tr className="totalRow">
+                              <td>Total</td>
+                              <td>{totalHours}</td>
+                              <td></td>
+                            </tr>
+                            <Button onClick={addTableRows} className="AddRow">
+                              Add new Row
+                            </Button>
+                          </>
+                        }
+                      </tbody>
+                    )}
+                  </table>
+                </div>
+              )}
+
             </div>
 
             <div className="main_content--right">
@@ -460,8 +472,8 @@ const Timelinecontent = () => {
               </Button>
             )}
           </div>
-        </form>
-      </section>
+        </form >
+      </section >
     </>
   );
 };

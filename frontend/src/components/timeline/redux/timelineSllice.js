@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { getProjectDetails, getProjectDeliverables } from './timelineActions'
+import { getProjectDetails } from './timelineActions'
 
 
 const initialState = {

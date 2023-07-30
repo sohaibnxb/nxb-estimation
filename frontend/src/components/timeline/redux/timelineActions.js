@@ -8,7 +8,6 @@ export const getProjectDetails = createAsyncThunk(
         try {
             const response = await axios.get(`${backendURL}/api/projects/${id}`)
             const project = await response.data
-            debugger
             return project
         } catch (error) {
             console.log("Error getting project details", error);

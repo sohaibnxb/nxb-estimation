@@ -29,7 +29,6 @@ export const getNotifications = createAsyncThunk(
 
         try {
             const response = await axios.get(`${backendURL}/api/notifications?receiptName=${username}`)
-
             const notifications = await response.data;
             return notifications;
         } catch (error) {

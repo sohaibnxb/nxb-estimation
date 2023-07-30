@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { userLogin } from "./redux/authActions";
 import { useFormik } from "formik";
-import { toast } from 'react-toastify';
 import {
   Box,
   Grid,
@@ -17,13 +16,12 @@ import "./Style.scss";
 // images
 import illustration from "../../../assets/images/side-img.png";
 import Logo from "../../../assets/images/nxb-logo.png";
-// import { userLogin } from "./services";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const userToken = localStorage.getItem("access-token")
   const { loading, userInfo, error } = useSelector((state) => state.auth)
-  const dispatch = useDispatch()
   const initialValues = {
     username: "",
     password: "",
@@ -33,12 +31,15 @@ const SignIn = () => {
     if (userInfo && userToken) {
       navigate('/dashboard')
     }
+  }, [])
+
+  useEffect(() => {
+    if (userInfo && userToken) {
+      navigate('/dashboard')
+    }
   }, [navigate, userInfo, userToken])
 
   const onSubmit = async (values) => {
-    console.log(values);
-    // const { username, password } = values;
-    // await userLogin(username, password, navigate);
     dispatch(userLogin(values))
   };
 

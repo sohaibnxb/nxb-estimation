@@ -10,7 +10,6 @@ import { getRole, getNotifications, getProjectsByManager, getProjectsByResource,
 import SearchIcon from "../../../../assets/images/search.svg";
 import SelectIcon from "../../../../assets/images/select.svg";
 
-
 const EstimatesHistory = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
@@ -20,22 +19,17 @@ const EstimatesHistory = () => {
 
   const { username, FullName } = jwt(userToken);
 
-
-  // const { userInfo } = useSelector(state => state.auth)
-
   const dispatch = useDispatch()
 
   const handleSelected = async (event) => {
     var selectedVal = event.target.value;
     if (selectedVal === "Vteams") {
-
       dispatch(getVteamsProjects())
-    } else if (selectedVal === "Nextbridge") {
-
+    }
+    else if (selectedVal === "Nextbridge") {
       dispatch(getNxbProjects())
-
-    } else if (selectedVal === "RecentlyAdded") {
-
+    }
+    else if (selectedVal === "RecentlyAdded") {
       dispatch(getRecentProjects(FullName))
     } else {
       console.log("no data");
@@ -46,14 +40,22 @@ const EstimatesHistory = () => {
     setInputSearch(event.target.value);
   };
 
+  // Projects Search
   useEffect(() => {
-    dispatch(getRole(username))
-    dispatch(getNotifications(username))
-  }, [])
+    if (inputSearch === '') {
+      setSearchResults(projects);
+    }
+    else {
+      const results = projects.filter((item) =>
+        item.proj_name.toLowerCase().includes(inputSearch.toLowerCase())
+      );
+      setSearchResults(results);
+    }
+  }, [inputSearch, projects]);
 
   useEffect(() => {
+
     const fetchData = () => {
-
       if (role === 'manager') {
         dispatch(getProjectsByManager(FullName))
       }
@@ -63,22 +65,11 @@ const EstimatesHistory = () => {
       else {
         console.log("No Projects Found");
       }
-
     }
+
     fetchData()
   }, [role, username, FullName, dispatch]);
 
-  // Projects Search
-  useEffect(() => {
-    if (inputSearch === '') {
-      setSearchResults(projects);
-    } else {
-      const results = projects.filter((item) =>
-        item.proj_name.toLowerCase().includes(inputSearch.toLowerCase())
-      );
-      setSearchResults(results);
-    }
-  }, [inputSearch, projects]);
 
   useEffect(() => {
     dispatch(getRole(username))

@@ -37,6 +37,7 @@
     "react-sortable-hoc": "^2.0.0",
     "react-table": "latest",
     "react-toastify": "^9.1.2",
+    "redux-persist": "^6.0.0",
     "sass": "^1.57.1",
     "styled-components": "^4.3.2",
     "validator": "^13.9.0",

@@ -12,19 +12,20 @@ import OpenSansBold from './fonts/OpenSans-Bold.ttf';
 import OpenSansBoldItalic from './fonts/OpenSans-BoldItalic.ttf';
 
 
-const ReactPdf = () => {
+const ReactPdf = ({ projId, projName }) => {
 
     const [project, setProject] = useState(null)
-    const [languages,setLanguages] = useState(null)
+    const [languages, setLanguages] = useState(null)
     const [projectCost, setProjectCost] = useState(null)
     const [projectScreens, setProjectScreens] = useState(null)
+
     const sum = projectScreens?.screens?.reduce((accumulator, screen) => {
         return accumulator + parseInt(screen.hours);
     }, 0)
 
     const notes = project?.terms_conditions.split(/[.\n]+/);
     const fetchProject = async (project) => {
-        const projId = localStorage.getItem("projId")
+        // const projId = localStorage.getItem("projId")
         console.log("projId", projId);
         try {
             const response = await axios.get(`http://localhost:5000/api/projects/${projId}`)
@@ -36,7 +37,7 @@ const ReactPdf = () => {
     }
 
     const fetchCosting = async () => {
-        const projName = localStorage.getItem("projName")
+        // const projName = localStorage.getItem("projName")
 
         try {
             const projectCost = await axios.get(`http://localhost:5000/api/costing/project?projectName=${projName}`)
@@ -47,12 +48,10 @@ const ReactPdf = () => {
         }
     }
     const fetchScreens = async () => {
-        const projId = localStorage.getItem("projId")
+        // const projId = localStorage.getItem("projId")
         try {
-
             const projectScreens = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${projId}`)
             console.log("project screens", projectScreens.data)
-
             setProjectScreens(projectScreens.data)
         } catch (error) {
             console.log(error);
@@ -506,7 +505,7 @@ const ReactPdf = () => {
                     <View>
                         <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Important <Text style={styles.heading.bold}>Notes</Text></Text>
                         <View style={styles.asmptionPage.notes}>
-                            
+
                             {notes?.map((note, index) => <Text key={index}><Text>{index + 1}. </Text>{note}</Text>)}
                         </View>
                     </View>
