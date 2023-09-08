@@ -9,7 +9,8 @@ const Statuses = () => {
   const [pendingNCount, setPendingNCount] = useState([]);
   const [draftNCount, setDraftNCount] = useState([]);
   // const URL = process.env.REACT_APP_SERVER_URL;
-  const backendURL = "http://localhost:5000";
+  // const backendURL = "http://localhost:5000";
+  const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
   const comp = `${backendURL}/api/projects/comp`;
   const pending = `${backendURL}/api/projects/pending`;
   const draft = `${backendURL}/api/projects/draft`;

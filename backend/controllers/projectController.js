@@ -13,7 +13,8 @@ const addProject = (req, res) => {
     proj_description,
     proj_tags,
     proj_status,
-    terms_conditions,
+    notes,
+    questions,
     temp_id,
     resource_name,
   } = req.query;
@@ -47,7 +48,8 @@ const addProject = (req, res) => {
         version: version,
         temp_id: temp_id,
         resource_name: resource_name,
-        terms_conditions: terms_conditions,
+        notes: notes,
+        questions: questions,
       });
       proj
         .save()
@@ -104,7 +106,7 @@ const getAllProjectByUSer = (req, res) => {
 // get single project
 
 const getProjectById = (req, res) => {
-  Project.findById(req.params.id)
+  Project.findById(req.params.id).populate("timelines")
     .then((result) => {
       res.send(result);
     })
@@ -247,7 +249,12 @@ const updateProjecByTags = (req, res) => {
 const updateProjecByTerms = (req, res) => {
   Project.findOneAndUpdate(
     { proj_name: req.body.proj_name },
-    { terms_conditions: req.body.terms_conditions },
+    {
+      $set: {
+        notes: req.body.notes,
+        questions: req.body.questions,
+      }
+    },
     { new: true }
   )
     .then((result) => {

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Timeline from "./timelineModal.js";
 const Schema = mongoose.Schema;
 
 const projectSchema = new Schema({
@@ -38,7 +39,10 @@ const projectSchema = new Schema({
     type: String,
     required: true,
   },
-  terms_conditions: {
+  notes: {
+    type: String,
+  },
+  questions: {
     type: String,
   },
   temp_id: {
@@ -48,6 +52,19 @@ const projectSchema = new Schema({
   resource_name: {
     type: String,
   },
+},
+  {
+    timestamps: true,
+    autoIndex: true,
+    toJSON: { virtuals: true },
+    versionKey: false,
+    id: false,
+  });
+
+projectSchema.virtual('timelines', {
+  ref: 'Timeline',
+  localField: '_id',
+  foreignField: 'projectId'
 });
 
 const Project = mongoose.model("Project", projectSchema);

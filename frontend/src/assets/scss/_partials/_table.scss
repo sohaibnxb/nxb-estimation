@@ -10,14 +10,16 @@ table {
           font-size: map-get($font-sizes, "small");
           color: map-get($base_colors, "blue-text-color");
           text-align: left;
-          padding: 0px 0px 0px calculateRem(12px);
+          padding: 10px 20px;
 
           &:nth-child(1) {
             width: 70%;
           }
 
           &:nth-child(2) {
+            text-align: center;
           }
+
           &:nth-child(3) {
             // width: 30%;
           }
@@ -89,7 +91,7 @@ table {
           &:nth-child(2) {
             box-shadow: 1px 0px 0px 0px map-get($base_colors, "input-border-color");
             position: relative;
-            // width: 18%;
+            width: 16%;
             text-align: center;
 
             .MuiInputBase-input {
@@ -98,7 +100,7 @@ table {
           }
 
           &:nth-child(3) {
-            width: 12%;
+            width: 3%;
             text-align: center;
 
           }
@@ -149,6 +151,22 @@ table {
               align-items: baseline;
               border-radius: 50%;
               padding: calculateRem(5px);
+              cursor: pointer;
+            }
+
+            .add-sub-row {
+              display: none;
+              position: absolute;
+              top: calculateRem(8px);
+              right: 34px;
+              content: url(../../images/add.svg);
+              height: calculateRem(17px);
+              width: calculateRem(17px);
+              background: map-get($base_colors, "input-border-color");
+              justify-content: center;
+              align-items: baseline;
+              border-radius: 50%;
+              padding: calculateRem(5px);
             }
 
             .MuiFormControl-root {
@@ -178,6 +196,10 @@ table {
               }
 
               .subdata {
+                display: flex;
+              }
+
+              .add-sub-row {
                 display: flex;
               }
 
@@ -211,21 +233,19 @@ table {
             }
           }
 
-          .timeline-action-btn{
+          .timeline-action-btn {
+
+
             text-transform: lowercase;
-            min-width: 32px;
+            min-width: 28px;
             height: 20px;
-            background: #f3f3f4;
-            color: map-get($base_colors, "black");
-            // position: absolute;
-            // right: 4px;
-            // top: 7px;
             margin-bottom: 5px;
-            box-shadow: 0px 2px 2px #00000014;
             z-index: 99;
             font-size: 12px;
-            &:not(:last-child){
-              margin-right: 5px;
+            opacity: .6;
+
+            &:hover {
+              opacity: 1;
             }
           }
         }
@@ -235,6 +255,23 @@ table {
         position: absolute;
         right: 4px;
         padding-top: 10px;
+      }
+
+      .add-new-row {
+        position: absolute;
+        right: -24px;
+        top: 20%;
+        border: 1px solid #e5e5e5;
+        min-width: 8px;
+        min-height: 54px;
+        padding: 6px;
+        border-left: 0;
+        border-radius: 4px;
+        opacity: 0.6;
+
+        &:hover{
+          opacity: 1;
+        }
       }
     }
   }

@@ -1,6 +1,9 @@
 import axios from "axios";
 import { toast } from 'react-toastify';
 
+const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+
+
 // new estimate
 export async function newEstimate(
   title,
@@ -15,7 +18,7 @@ export async function newEstimate(
 ) {
   try {
     const response = await toast.promise(axios.post(
-      `http://localhost:5000/api/projects/?proj_name=${title}&proj_type=${proposalType}&prepared_by=${preparedby}&proposal_for=${clientName}&created_date=${date}&proj_description=${description}&proj_status=${proj_status}&version=${version}&resource_name=${selectedUser}`
+      `${backendURL}/api/projects/?proj_name=${title}&proj_type=${proposalType}&prepared_by=${preparedby}&proposal_for=${clientName}&created_date=${date}&proj_description=${description}&proj_status=${proj_status}&version=${version}&resource_name=${selectedUser}`
     ), {
       pending: 'Creating new project',
       success: 'New project created successfully',
@@ -41,7 +44,7 @@ export async function sendNotification(
 ) {
   var key = localStorage.getItem("username");
   await toast.promise(axios.post(
-    `http://localhost:5000/api/notifications/?senderName=${key}&receiptName=${options}&projectName=${title}&read=${isRead}&count=${totalcount}`
+    `${backendURL}/api/notifications/?senderName=${key}&receiptName=${options}&projectName=${title}&read=${isRead}&count=${totalcount}`
   ), {
     pending: 'Authentication is pending',
     success: 'Notification sent successfully',

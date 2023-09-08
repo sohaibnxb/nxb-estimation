@@ -4,7 +4,7 @@ import Select, { components } from "react-select";
 import CreatableSelect from 'react-select/creatable';
 import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Tabs, Tab, Typography, Box } from "@mui/material";
 import Pdf from "../../assets/images/google-drive-pdf-file.png";
 import Search from "../../assets/images/search.svg";
 import ProgressBar from "../common/ProgressBar";
@@ -25,10 +25,42 @@ const DropdownIndicator = (props) => {
   )
 }
 
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+
+const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+
+
 const Languages = () => {
   const [selectedOption, setSelectedOption] = useState([]);
+  const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate()
-  const [message, setMessage] = useState('');
+  const [notes, setNotes] = useState('');
+  const [questions, setQuestions] = useState('');
   const [vteam, setVteam] = useState('6395ded86d71e15926fbbdc1');
   const [nxb, setNxb] = useState('6395df75a9038f587df95185');
   const [generatePdf, setGeneratePdf] = useState(false)
@@ -37,6 +69,9 @@ const Languages = () => {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const previewDropDownRef = useRef(null)
   const { project } = useSelector(state => state.timeline)
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
 
   const options = [
@@ -57,7 +92,12 @@ const Languages = () => {
   ];
 
   const handleMessageChange = event => {
-    setMessage(event.target.value);
+    setNotes(event.target.value);
+    setGeneratePdf(false);
+    console.log(event.target.value);
+  };
+  const handleQuestionsChange = event => {
+    setQuestions(event.target.value);
     setGeneratePdf(false);
     console.log(event.target.value);
   };
@@ -65,6 +105,8 @@ const Languages = () => {
   const toggleDropdown = () => {
     setIsDropDownOpen(!isDropDownOpen);
   };
+
+
 
   async function addTagsAndTerms() {
     let getValue = selectedOption.map(function (s) {
@@ -77,7 +119,7 @@ const Languages = () => {
 
     // Set languages
     await axios
-      .put("http://localhost:5000/api/projects/tags", {
+      .put(`${backendURL}/api/projects/tags`, {
         proj_name: project?.proj_name,
         proj_tags: getValue,
       })
@@ -90,13 +132,14 @@ const Languages = () => {
         console.log(error);
         console.log("error form terms");
       });
-    console.log(message, 'message');
+    console.log(notes, 'notes');
 
     // Set Notes
     await axios
-      .put("http://localhost:5000/api/projects/terms", {
+      .put(`${backendURL}/api/projects/terms`, {
         proj_name: project?.proj_name,
-        terms_conditions: message
+        notes: notes,
+        questions: questions,
       })
       .then((response) => {
         console.log("res from terms & conditions ", response.data);
@@ -106,12 +149,13 @@ const Languages = () => {
       });
   }
 
+
   async function AddVteamTemp() {
     await addTagsAndTerms();
     // vteams template
     try {
       const response = await axios
-        .put("http://localhost:5000/api/projects/temp", {
+        .put(`${backendURL}/api/projects/temp`, {
           proj_name: project?.proj_name,
           temp_id: vteam,
         })
@@ -135,7 +179,7 @@ const Languages = () => {
     // var projName = localStorage.getItem("projName");
     // vteams template
     axios
-      .put("http://localhost:5000/api/projects/temp", {
+      .put(`${backendURL}/api/projects/temp`, {
         proj_name: project?.proj_name,
         temp_id: nxb,
       })
@@ -165,6 +209,15 @@ const Languages = () => {
 
   }, [])
 
+  // Load the project languages and notes
+  useEffect(() => {
+    const formatedOptions = project?.proj_tags.map(projectTag => ({ value: projectTag, label: projectTag }))
+    setSelectedOption(formatedOptions)
+    setNotes(project?.notes)
+    setQuestions(project?.questions)
+    debugger
+  }, [])
+
   return (
     <>
       <Topbar estimate={false} limiteRole={false} />
@@ -174,13 +227,16 @@ const Languages = () => {
       <form onSubmit={(e) => e.preventDefault()}>
         <Card className="languages-card">
           <div>
-            <h2 className="languages-title"> Programming Languages</h2>-
+            <h2 className="languages-title"> Programming Languages</h2>
             <CreatableSelect
               placeholder="Search / add tags"
               isMulti
-              defaultValue={selectedOption}
+              value={[...selectedOption]}
               onChange={(options) => handleSelectedOptions(options)}
               options={options}
+              styles={{
+                menu: provided => ({ ...provided, zIndex: 3 })
+              }}
               components={{
                 IndicatorSeparator: () => null,
                 DropdownIndicator,
@@ -188,22 +244,45 @@ const Languages = () => {
             />
           </div>
 
-          <div>
-            <h2 className="languages-title"> Important Notes</h2>
-            <textarea
-              id="message"
-              name="message"
-              value={message}
-              onChange={handleMessageChange}
-              cols="30"
-              rows="10"
-              placeholder="Insert your important notes here..."
-              className="imp-notes"
-            >
-            </textarea>
-          </div>
+
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', marginTop: '24px' }}>
+            <Box sx={{ alignSelf: 'center' }}>
+              <Tabs value={tabValue} onChange={handleTabChange} sx={{ backgroundColor: '#F4F4F5', borderRadius: '8px', padding: '6px', '& .MuiTabs-indicator': { height: '50px', backgroundColor: 'white', borderRadius: '6px', zIndex: '1' } }} aria-label="basic tabs example" >
+                <Tab label="Important Notes" {...a11yProps(0)} sx={{ color: 'rgb(113, 113, 122)', textTransform: 'capitalize', minHeight: '40px', zIndex: '2', padding: '12px', '&.Mui-selected': { color: 'rgb(9, 9, 11)', } }} />
+                <Tab label="Assumption & Questions" {...a11yProps(1)} sx={{ color: 'rgb(113, 113, 122)', textTransform: 'capitalize', minHeight: '40px', zIndex: '2', padding: '12px', '&.Mui-selected': { color: 'rgb(9, 9, 11)', } }} />
+              </Tabs>
+            </Box>
+            <CustomTabPanel value={tabValue} index={0}>
+              <textarea
+                id="notes"
+                name="notes"
+                value={notes}
+                onChange={handleMessageChange}
+                cols="30"
+                rows="10"
+                placeholder="Insert your important notes here..."
+                className="imp-notes"
+              >
+              </textarea>
+            </CustomTabPanel>
+            <CustomTabPanel value={tabValue} index={1}>
+              <textarea
+                id="questions"
+                name="questions"
+                value={questions}
+                onChange={handleQuestionsChange}
+                cols="30"
+                rows="10"
+                placeholder="Insert your Assumption & Questions here..."
+                className="imp-notes"
+              >
+              </textarea>
+            </CustomTabPanel>
+
+          </Box>
         </Card>
 
+        {/* Action Buttons */}
         <div className="estimate-btns-container">
           <Button
             variant="contained"

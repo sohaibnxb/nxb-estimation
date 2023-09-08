@@ -9,6 +9,11 @@ import TableRows from "./TableRows";
 
 import { getProjectDetails } from "../redux/timelineActions";
 
+import addIcon from "../../../assets/images/add.svg"
+
+const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+
+
 const Timelinecontent = () => {
   const navigate = useNavigate();
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
@@ -70,12 +75,13 @@ const Timelinecontent = () => {
     temp[mainIndex].screenSections[subIndex] = evnt.target.value;
     setRowsData([...temp]);
   };
+
   // screens added with estimates in screen schema
   async function addScreenNotify() {
     console.log(rowsData, 'addScreenNotifyfunction');
     if (rowsData) {
 
-      const projectEstimation = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
+      const projectEstimation = await axios.get(`${backendURL}/api/screens/screen?project_id=${id}`)
         .then((response) => {
           console.log(response.data);
           return response.data
@@ -86,7 +92,7 @@ const Timelinecontent = () => {
       console.log("projectEstimation", projectEstimation);
 
       if (projectEstimation === '') {
-        await toast.promise(axios.post(`http://localhost:5000/api/screens/${id}`, { rowsData }), {
+        await toast.promise(axios.post(`${backendURL}/api/screens/${id}`, { rowsData }), {
           pending: 'Creating new screen',
           success: 'New Screen created successfully',
           error: 'Error in creating new screen'
@@ -99,13 +105,13 @@ const Timelinecontent = () => {
           });
       }
       else {
-        await toast.promise(axios.put(`http://localhost:5000/api/screens/${id}`, {
+        await toast.promise(axios.put(`${backendURL}/api/screens/${id}`, {
           project_id: id,
           screens: rowsData,
         }), {
           pending: 'Updating new screen',
           success: 'Update screen estimation successfully',
-          error: 'Error in creating new screen'
+          error: 'Error in updating new screen'
         })
           .then((response) => {
             console.log(response.data);
@@ -119,7 +125,7 @@ const Timelinecontent = () => {
       // var projKey = localStorage.getItem("projName");
       // var managerKey = localStorage.getItem("managerName");
       await toast.promise(axios.post(
-        `http://localhost:5000/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
+        `${backendURL}/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
       ), {
         pending: 'Sending notification',
         success: 'Notification sent successfully to your manager',
@@ -134,7 +140,7 @@ const Timelinecontent = () => {
       //receiptant read notification
       // const projN = localStorage.getItem("projName");
       await axios
-        .put(`http://localhost:5000/api/notifications/?projectName=${project?.proj_name}`, {
+        .put(`${backendURL}/api/notifications/?projectName=${project?.proj_name}`, {
           read: true,
         })
         .then((res) => {
@@ -145,7 +151,7 @@ const Timelinecontent = () => {
         });
       // project status change
       await axios
-        .put(`http://localhost:5000/api/projects/?_id=${id}`, {
+        .put(`${backendURL}/api/projects/?_id=${id}`, {
           proj_status: "Ready for Review",
         })
         .then((res) => {
@@ -161,7 +167,7 @@ const Timelinecontent = () => {
 
     // if (rowsData != "") {
     //   axios
-    //     .post(`http://localhost:5000/api/screens/${id}`, { rowsData })
+    //     .post(`${backendURL}/api/screens/${id}`, { rowsData })
     //     .then((response) => {
     //       console.log(response.data);
     //       alert("New Screen created successfully");
@@ -173,7 +179,7 @@ const Timelinecontent = () => {
     // }
     // // project status change
     // axios
-    //   .put(`http://localhost:5000/api/projects/?_id=${id}`, {
+    //   .put(`${backendURL}/api/projects/?_id=${id}`, {
     //     proj_status: "Draft",
     //   })
     //   .then((res) => {
@@ -183,6 +189,7 @@ const Timelinecontent = () => {
     //     console.log(error);
     //   });
   }
+
   // total sum
   var totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
   // select option
@@ -195,6 +202,7 @@ const Timelinecontent = () => {
       console.log(selectedOption);
     }
   };
+
 
   function navigatePage() {
     console.log('navigate hours', totalHours)
@@ -210,10 +218,11 @@ const Timelinecontent = () => {
     return navigate("/dashboard");
   }
   // Api
+
   useEffect(() => {
     console.log(id);
     // axios
-    //   .get(`http://localhost:5000/api/projects/${id}`)
+    //   .get(`${backendURL}/api/projects/${id}`)
     //   .then((res) => {
     //     setProjectDetails([res.data]);
     //     console.log([res.data.proj_name]);
@@ -230,7 +239,7 @@ const Timelinecontent = () => {
     // if timeline is already done then import data
     setLoading(true);
     const projectScreens = axios
-      .get(`http://localhost:5000/api/screens/screen?project_id=${id}`)
+      .get(`${backendURL}/api/screens/screen?project_id=${id}`)
       .then((response) => {
         if (response.data) {
           setRowsData(response.data.screens)
@@ -271,8 +280,9 @@ const Timelinecontent = () => {
                     <thead>
                       <tr>
                         <th>{project?.proj_type}</th>
+
                         <th>
-                          <div className="assign-selectbox select-timeMode">
+                          {/* <div className="assign-selectbox select-timeMode">
                             <select
                               id="timeMode"
                               name="users"
@@ -286,7 +296,8 @@ const Timelinecontent = () => {
                               ))}
                             </select>
                             <img src={SelectIcon} alt="select" />
-                          </div>
+                          </div> */}
+                          EST. (Hours)
                         </th>
                         <th></th>
                       </tr>
@@ -343,6 +354,12 @@ const Timelinecontent = () => {
                           addTableRows={addTableRows}
                           deleteTableExtraRows={deleteTableExtraRows}
                         />
+                        <Button
+                          className="add-new-row"
+                          onClick={() => addTableRows()}
+                        >
+                          <img src={addIcon} alt="add" width={10} />
+                        </Button>
                         {
                           <>
                             <tr className="totalRow">

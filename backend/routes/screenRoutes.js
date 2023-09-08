@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  addScreen,
+  addTimelines,
   deleteScreen,
   getAllScreen,
   getScreenById,
@@ -16,7 +16,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllScreen);
-router.post("/:id", addScreen);
+router.post("/:id", addTimelines);
 router.get("/screen", getScreenById);
 router.delete("/:id", deleteScreen);
 router.put("/:id", updateScreen);

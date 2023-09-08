@@ -1,20 +1,44 @@
 import Screen from "../models/screenModel.js";
+import Timeline from "../models/timelineModal.js";
 
 //add Screen
 
-const addScreen = (req, res) => {
-  const screen = new Screen({
-    screens: req.body.rowsData,
-    projectId: req.params.id,
-  });
-  screen
-    .save()
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+const addTimelines = async (req, res) => {
+  try {
+    const timelines = req.body.timelines;
+    console.log("timelines", timelines);
+    await Promise.all(
+
+      timelines.map(async timeline => {
+        await Timeline.updateOne(
+            { _id: timeline?._id },
+            timeline,
+            {
+              upsert: true,
+              setDefaultsOnInsert: true,
+            },
+          )
+      })
+
+    )
+
+    return res.status(200).json({ message: "Timeline added successfully" })
+  } catch (error) {
+    return res.status(400).json({ message: "Error creating timeline", error: error.message })
+  }
+
+  // const screen = new Screen({
+  //   screens: req.body.rowsData,
+  //   projectId: req.params.id,
+  // });
+  // screen
+  //   .save()
+  //   .then((result) => {
+  //     res.send(result);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 };
 
 // get all screens
@@ -67,4 +91,4 @@ const updateScreen = (req, res) => {
       console.log(err);
     });
 };
-export { addScreen, getAllScreen, getScreenById, deleteScreen, updateScreen };
+export { addTimelines, getAllScreen, getScreenById, deleteScreen, updateScreen };

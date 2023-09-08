@@ -33,5 +33,8 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/costing", costingRoutes);
 // listen port on 5000
-const PORT = process.env.PORT || 5000;
-app.listen(PORT);
+const port = process.env.PORT || 5000;
+const host = process.env.BACKEND_URL || '0.0.0.0'
+app.listen(port, host, () => {
+  console.log(`server listening on ${host}:${port}`);
+});

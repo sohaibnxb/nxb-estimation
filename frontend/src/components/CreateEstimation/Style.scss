@@ -30,6 +30,7 @@
 
     .MuiFormControl-root {
       width: 100%;
+
       .MuiTextField-root .MuiInputBase-root {
         width: 100%;
       }
@@ -37,8 +38,7 @@
   }
 
   .description {
-    padding: calculateRem(57px) calculateRem(30px) calculateRem(30px)
-      calculateRem(30px);
+    padding: calculateRem(57px) calculateRem(30px) calculateRem(30px) calculateRem(30px);
     box-shadow: 0px 3px 6px map-get($base_colors, "shadow-color");
     border-radius: calculateRem(8px);
     background-color: map-get($base_colors, "white");
@@ -48,6 +48,10 @@
       font-size: map-get($font-sizes, "small");
       color: map-get($base_colors, "black");
       margin-bottom: calculateRem(6px);
+    }
+
+    .description-error {
+      color: map-get($base_colors, "danger-color");
     }
 
     textarea {
@@ -60,6 +64,7 @@
       color: map-get($base_colors, "primary-color");
       line-height: 23px;
     }
+
   }
 }
 
@@ -67,6 +72,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   .estimate-nav-btn {
     @include size(50px, 180px);
     // background-color: map-get($page_bg, 'topbar-gd1');

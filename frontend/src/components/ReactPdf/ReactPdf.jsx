@@ -11,6 +11,8 @@ import OpenSansMedium from './fonts/OpenSans-Medium.ttf';
 import OpenSansBold from './fonts/OpenSans-Bold.ttf';
 import OpenSansBoldItalic from './fonts/OpenSans-BoldItalic.ttf';
 
+const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+
 
 const ReactPdf = ({ projId, projName }) => {
 
@@ -23,12 +25,17 @@ const ReactPdf = ({ projId, projName }) => {
         return accumulator + parseInt(screen.hours);
     }, 0)
 
-    const notes = project?.terms_conditions.split(/[.\n]+/);
+    // const notes = project?.notes.split(/(?<=\.)\n|(?<=\.) /);
+
+    // const notes = project?.notes.split(/[.\n]+/);
+    // const questions = project?.questions.split(/[.\n]+/);
+    const notes = project?.notes.split('\n');
+    const questions = project?.questions.split('\n');
     const fetchProject = async (project) => {
         // const projId = localStorage.getItem("projId")
         console.log("projId", projId);
         try {
-            const response = await axios.get(`http://localhost:5000/api/projects/${projId}`)
+            const response = await axios.get(`${backendURL}/api/projects/${projId}`)
             console.log("proj response", response);
             setProject(response.data)
         } catch (error) {
@@ -40,7 +47,7 @@ const ReactPdf = ({ projId, projName }) => {
         // const projName = localStorage.getItem("projName")
 
         try {
-            const projectCost = await axios.get(`http://localhost:5000/api/costing/project?projectName=${projName}`)
+            const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${projName}`)
             console.log(projectCost.data)
             setProjectCost(projectCost.data[0])
         } catch (error) {
@@ -50,7 +57,7 @@ const ReactPdf = ({ projId, projName }) => {
     const fetchScreens = async () => {
         // const projId = localStorage.getItem("projId")
         try {
-            const projectScreens = await axios.get(`http://localhost:5000/api/screens/screen?project_id=${projId}`)
+            const projectScreens = await axios.get(`${backendURL}/api/screens/screen?project_id=${projId}`)
             console.log("project screens", projectScreens.data)
             setProjectScreens(projectScreens.data)
         } catch (error) {
@@ -77,6 +84,7 @@ const ReactPdf = ({ projId, projName }) => {
 
     // Style Object
     const styles = StyleSheet.create({
+
         page: {
             color: '#000000',
             fontFamily: 'Open Sans',
@@ -118,7 +126,19 @@ const ReactPdf = ({ projId, projName }) => {
 
             }
         },
+        // Utilities
 
+        listDiscMarker: {
+            width: '6px',
+            height: '6px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#374151',
+            borderRadius: '3px',
+            marginRight: '6px'
+        }
+        ,
         // Main Page
         mainPage: {
             position: 'relative',
@@ -300,10 +320,18 @@ const ReactPdf = ({ projId, projName }) => {
                     marginVertical: '10px',
                 },
                 language: {
-                    marginVertical: '2px'
+                    marginVertical: '2px',
+                    marginLeft: '10px',
                 }
             },
             notes: {
+                marginLeft: '10px',
+                note: {
+                    marginVertical: '2px'
+                }
+            },
+            questions: {
+                marginLeft: '10px',
                 note: {
                     marginVertical: '2px'
                 }
@@ -371,7 +399,7 @@ const ReactPdf = ({ projId, projName }) => {
                     {/*  Content */}
                     <View>
                         <Text style={styles.heading}>Your <Text style={styles.heading.bold}>Project</Text></Text>
-                        <Text style={[styles.bodyText, styles.processPage.text]}>My Medication station is a devices where patient can store their medicine and with the help of technology it will make them easy to ﬁnd their medication effortlessly.</Text>
+                        <Text style={[styles.bodyText, styles.processPage.text]}>{project?.proj_description}</Text>
                         <Text style={styles.heading}>Our <Text style={styles.heading.bold}>Process</Text></Text>
                         <Image style={[styles.processPage.processImg, { marginBottom: '30px', }]} src={processImg} />
                         <Text style={styles.bodyText}>You will have complete ownership of any resources developed as part of this process; including code, graphics, documentation etc. </Text>
@@ -490,7 +518,13 @@ const ReactPdf = ({ projId, projName }) => {
                         <Image style={styles.header.vteamsImg} src={vteamsImg} quality={90} />
                     </View>
 
-                    <Text style={styles.heading}>Assumption & <Text style={styles.heading.bold}>Questions</Text></Text>
+                    {/* Questions */}
+                    <View>
+                        <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Assumption & <Text style={styles.heading.bold}>Questions</Text></Text>
+                        <View style={styles.asmptionPage.questions}>
+                            {questions?.map((question, index) => <View key={index} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}><View style={styles.listDiscMarker}> </View> <Text> {question}</Text></View>)}
+                        </View>
+                    </View>
 
                     {/* Languages */}
                     <View>
@@ -505,8 +539,8 @@ const ReactPdf = ({ projId, projName }) => {
                     <View>
                         <Text style={[styles.heading, styles.asmptionPage.languages.title]}>Important <Text style={styles.heading.bold}>Notes</Text></Text>
                         <View style={styles.asmptionPage.notes}>
-
                             {notes?.map((note, index) => <Text key={index}><Text>{index + 1}. </Text>{note}</Text>)}
+                            {/* {notes?.map((note, index) => <View key={index} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}><View style={styles.listDiscMarker}> </View> <Text> {note}</Text></View>)} */}
                         </View>
                     </View>
                 </View>

@@ -7,6 +7,9 @@ import {
   Button,
   textFieldClasses,
 } from "@mui/material";
+
+import closeIcon from "../../../assets/images/close.svg"
+import addIcon from "../../../assets/images/add.svg"
 const TableRows = ({
   rowsData,
   rowsExtraData,
@@ -43,7 +46,7 @@ const TableRows = ({
             className="secondary-button add-subRow"
             onClick={() => addSubRows(index)}
           >
-            +
+            <img src={addIcon} alt="add" width={10} />
           </Button>
           {screenSections.length > 0
             ? screenSections.map((elem, subIndex) => {
@@ -56,7 +59,7 @@ const TableRows = ({
                       className="secondary-button add-subRow"
                       onClick={() => addSubRows(index, subIndex)}
                     >
-                      +
+                      <img src={addIcon} alt="add" width={10} />
                     </Button>
                     <FormControl key={elem.subIndex}>
                       <TextField
@@ -104,14 +107,14 @@ const TableRows = ({
             className="secondary-button  timeline-action-btn"
             onClick={(e) => deleteTableRows(index)}
           >
-            x
+            <img src={closeIcon} alt="close" width={8} />
           </Button>
-          <Button
+          {/* <Button
             className="secondary-button timeline-action-btn"
             onClick={() => addTableRows()}
           >
-            +
-          </Button>
+            <img src={addIcon} alt="add" width={12} />
+          </Button> */}
 
           {/* <span
               className="data"

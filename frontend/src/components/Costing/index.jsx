@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from 'axios';
@@ -17,23 +17,29 @@ import { useFormik } from "formik";
 
 import "./Style.scss";
 
+const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+
 const Costing = () => {
 
+  const [projectHourRate, setProjectHourRate] = useState(0)
   const { state } = useLocation();
   const navigate = useNavigate();
   const { project } = useSelector(state => state.timeline)
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      hours: " ",
+      hours: projectHourRate ? projectHourRate : '',
     },
     onSubmit: async (values) => {
       const hours = parseInt(values.hours);
       let projName = project?.proj_name;
+      debugger
       let totalcost = hours * state;
       let payload = { projName, hours, state, totalcost };
-      const projectCostExist = await axios.get(`http://localhost:5000/api/costing/project?projectName=${projName}`)
+      const projectCostExist = await axios.get(`${backendURL}/api/costing/project?projectName=${projName}`)
         .then((response) => {
+          console.log('projectCostExist', response.data);
           return response.data
         })
         .catch((error) => {
@@ -42,7 +48,7 @@ const Costing = () => {
       debugger
       if (projectCostExist.length == 0) {
         const postReq = await toast.promise(
-          axios.post(`http://localhost:5000/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`),
+          axios.post(`${backendURL}/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`),
           {
             pending: 'Adding Project Costing',
             success: 'Costing added successfully',
@@ -60,7 +66,7 @@ const Costing = () => {
       else {
         debugger
         const putReq = await toast.promise(
-          axios.put("http://localhost:5000/api/costing/id", {
+          axios.put(`${backendURL}/api/costing/id`, {
             projectName: projName,
             totalHours: state,
             hourRate: hours,
@@ -89,6 +95,22 @@ const Costing = () => {
     },
   });
 
+
+  // Load the cost of project if project exists
+  useLayoutEffect(() => {
+
+    async function fetchProjectCosting() {
+      const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${project?.proj_name}`);
+      if (projectCost) {
+        console.log('first', projectCost);
+        const hourRate = parseInt(projectCost.data[0]?.hourRate)
+        setProjectHourRate(hourRate)
+      }
+      // projectCost()
+    }
+    fetchProjectCosting()
+  }
+    , [])
   return (
     <>
       <Topbar estimate={false} limiteRole={false} />
@@ -117,6 +139,8 @@ const Costing = () => {
                     name="hours"
                     onChange={formik.handleChange}
                     value={formik.values.hours}
+                    type="number"
+                    inputProps={{ min: 0 }}
                   />
                 </FormControl>
                 / hours
@@ -131,7 +155,6 @@ const Costing = () => {
               <td className="text-bold">$ {formik.values.hours * state}</td>
             </tr>
           </table>
-
         </Card>
         <div container className="estimate-btns-container">
           <Button

@@ -14,7 +14,7 @@ const ScreenSchema = new Schema([
       required: true,
     },
   },
-]);
+],{ _id : false });
 
 const ScreenListSchema = new Schema([
   {

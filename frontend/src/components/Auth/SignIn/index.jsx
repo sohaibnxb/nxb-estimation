@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { userLogin } from "./redux/authActions";
@@ -27,13 +27,13 @@ const SignIn = () => {
     password: "",
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (userInfo && userToken) {
       navigate('/dashboard')
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (userInfo && userToken) {
       navigate('/dashboard')
     }
@@ -98,9 +98,11 @@ const SignIn = () => {
                       variant="outlined"
                       name="username"
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       value={formik.values.username}
                     />
-                    {formik.errors.username ? (
+
+                    {formik.touched.username && formik.errors.username ? (
                       <Typography variant="subtitle2">
                         {formik.errors.username}
                       </Typography>
@@ -113,9 +115,10 @@ const SignIn = () => {
                       type="password"
                       name="password"
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       value={formik.values.password}
                     />
-                    {formik.errors.password ? (
+                    {formik.touched.password && formik.errors.password ? (
                       <Typography variant="subtitle2">
                         {formik.errors.password}
                       </Typography>

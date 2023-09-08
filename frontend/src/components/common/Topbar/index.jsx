@@ -26,10 +26,11 @@ const Topbar = ({ estimate = false }) => {
 
 
   const removeToken = () => {
-    localStorage.removeItem("access-token");
+    // localStorage.removeItem("access-token");
     // localStorage.removeItem("user");
     // localStorage.removeItem("roleName");
     // localStorage.removeItem("username");
+    localStorage.clear()
     navigate("/");
   };
   // getting initials

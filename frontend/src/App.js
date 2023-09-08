@@ -47,9 +47,7 @@ function App() {
   return (
     <>
       <Routes>
-        {(userInfo && userToken)
-        }
-
+        <Route path="/" element={<SignIn />}></Route>
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/new" element={<CreateEstimation />}></Route>
         <Route path="/costing" element={<Costing />}></Route>
