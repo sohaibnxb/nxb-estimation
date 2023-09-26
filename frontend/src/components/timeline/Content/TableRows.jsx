@@ -22,8 +22,7 @@ const TableRows = ({
   addTableRows
 }) => {
   return rowsData?.map((data, index) => {
-    const { screenName, hours, screenSections } = data;
-
+    const { itemName, hours, subItems } = data;
     return (
       <tr key={index}>
         <td>
@@ -31,7 +30,7 @@ const TableRows = ({
           <FormControl>
             <TextField
               variant="standard"
-              name="screenName"
+              name="itemName"
               placeholder="App Icon"
               onChange={(evnt) => handleChange(index, evnt)}
               onKeyPress={(e) => {
@@ -39,7 +38,7 @@ const TableRows = ({
                   addTableRows()
                 }
               }}
-              value={screenName}
+              value={itemName}
             />
           </FormControl>
           <Button
@@ -48,9 +47,9 @@ const TableRows = ({
           >
             <img src={addIcon} alt="add" width={10} />
           </Button>
-          {screenSections.length > 0
-            ? screenSections.map((elem, subIndex) => {
-              //const { screenSections } = elem;
+          {subItems?.length > 0
+            ? subItems.map((elem, subIndex) => {
+              //const { subItems } = elem;
               return (
                 <>
                   <td className="subRowInput">
@@ -66,7 +65,7 @@ const TableRows = ({
                         type="text"
                         key={subIndex}
                         variant="standard"
-                        name="screenSections"
+                        name="subItems"
                         placeholder="Login Screen"
                         onChange={(evnt) => handleExtraChange(index, subIndex, evnt)}
                         onKeyPress={(e) => {
@@ -125,8 +124,5 @@ const TableRows = ({
     )
   });
 };
-{/* <tr className="totalRow">
-          <td>Total</td>
-          <td>{totalhours}</td>
-        </tr> */}
+
 export default TableRows;

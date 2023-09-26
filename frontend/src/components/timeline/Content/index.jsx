@@ -5,196 +5,151 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
+
 import TableRows from "./TableRows";
+import TimelineTable from "./TimlineTable";
 
 import { getProjectDetails } from "../redux/timelineActions";
 
 import addIcon from "../../../assets/images/add.svg"
+import { addTimeline, deleteTimeline } from "../redux/timelineSllice";
 
 const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
 
 const Timelinecontent = () => {
-  const navigate = useNavigate();
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
-  const [rowsData, setRowsData] = useState([]);
-  const [rowsExtraData, setRowsExtraData] = useState([]);
-  const [showRow, setShowRow] = useState(false);
-  const [showExtraRow, setShowExtraRow] = useState(true);
-  const [loading, setLoading] = useState(false)
+  const [timelineTables, setTimelineTables] = useState([])
+
+  const [totalHours, setTotalHours] = useState()
+
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { project } = useSelector(state => state.timeline)
-  const { username, managerName } = useSelector(state => state.auth.userInfo)
+  const { timelines, loading } = useSelector(state => state.timeline)
   const { role } = useSelector(state => state.dashboard)
 
-
-  // add new rows
-  const addTableRows = () => {
-    const rowsInput = {
-      screenName: "",
-      hours: "",
-      screenSections: []
-    };
-    setRowsData([...rowsData, rowsInput]);
-    setShowRow(true);
-  };
-  // add sub row
-  const addSubRows = (index, subIndex) => {
-    var temp = [...rowsData];
-    temp[index].screenSections.splice(subIndex + 1, 0, "");
-    setRowsData([...temp]);
-  };
-  // delete rows
-  const deleteTableRows = (index) => {
-    const rows = [...rowsData];
-    rows.splice(index, 1);
-    if (rows.length === 0) {
-      setShowRow(false);
-    }
-    setRowsData(rows)
-  };
-  //delete sub rows
-  const deleteTableExtraRows = (mainIndex, subIndex) => {
-    var temp = [...rowsData];
-    temp[mainIndex].screenSections.splice(subIndex, 1);
-    setRowsData([...temp]);
-  };
-  // change input and getting values
-  const handleChange = async (index, evnt) => {
-    // evnt.preventDefault();
-    const { name, value } = evnt.target;
-    const rowsInput = [...rowsData];
-    rowsInput[index][name] = value;
-    console.log("rowsInput", rowsInput);
-    setRowsData(rowsInput);
-  };
-  // change sub input and getting values
-  const handleExtraChange = async (mainIndex, subIndex, evnt) => {
-    const temp = [...rowsData];
-    temp[mainIndex].screenSections[subIndex] = evnt.target.value;
-    setRowsData([...temp]);
-  };
+  const navigate = useNavigate();
 
   // screens added with estimates in screen schema
-  async function addScreenNotify() {
-    console.log(rowsData, 'addScreenNotifyfunction');
-    if (rowsData) {
+  // async function addScreenNotify() {
+  //   console.log(rowsData, 'addScreenNotifyfunction');
+  //   if (rowsData) {
 
-      const projectEstimation = await axios.get(`${backendURL}/api/screens/screen?project_id=${id}`)
-        .then((response) => {
-          console.log(response.data);
-          return response.data
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      console.log("projectEstimation", projectEstimation);
+  //     const projectEstimation = await axios.get(`${backendURL}/api/screens/screen?project_id=${id}`)
+  //       .then((response) => {
+  //         console.log(response.data);
+  //         return response.data
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //     console.log("projectEstimation", projectEstimation);
 
-      if (projectEstimation === '') {
-        await toast.promise(axios.post(`${backendURL}/api/screens/${id}`, { rowsData }), {
-          pending: 'Creating new screen',
-          success: 'New Screen created successfully',
-          error: 'Error in creating new screen'
-        })
-          .then((response) => {
-            console.log(response.data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-      else {
-        await toast.promise(axios.put(`${backendURL}/api/screens/${id}`, {
-          project_id: id,
-          screens: rowsData,
-        }), {
-          pending: 'Updating new screen',
-          success: 'Update screen estimation successfully',
-          error: 'Error in updating new screen'
-        })
-          .then((response) => {
-            console.log(response.data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-      // Notification send it to manager
-      // var key = localStorage.getItem("username");
-      // var projKey = localStorage.getItem("projName");
-      // var managerKey = localStorage.getItem("managerName");
-      await toast.promise(axios.post(
-        `${backendURL}/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
-      ), {
-        pending: 'Sending notification',
-        success: 'Notification sent successfully to your manager',
-        error: 'Error in sending notifications'
-      })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      //receiptant read notification
-      // const projN = localStorage.getItem("projName");
-      await axios
-        .put(`${backendURL}/api/notifications/?projectName=${project?.proj_name}`, {
-          read: true,
-        })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      // project status change
-      await axios
-        .put(`${backendURL}/api/projects/?_id=${id}`, {
-          proj_status: "Ready for Review",
-        })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
+  //     if (projectEstimation === '') {
+  //       await toast.promise(axios.post(`${backendURL}/api/screens/${id}`, { rowsData }), {
+  //         pending: 'Creating new screen',
+  //         success: 'New Screen created successfully',
+  //         error: 'Error in creating new screen'
+  //       })
+  //         .then((response) => {
+  //           console.log(response.data);
+  //         })
+  //         .catch((error) => {
+  //           console.log(error);
+  //         });
+  //     }
+  //     else {
+  //       await toast.promise(axios.put(`${backendURL}/api/screens/${id}`, {
+  //         project_id: id,
+  //         screens: rowsData,
+  //       }), {
+  //         pending: 'Updating new screen',
+  //         success: 'Update screen estimation successfully',
+  //         error: 'Error in updating new screen'
+  //       })
+  //         .then((response) => {
+  //           console.log(response.data);
+  //         })
+  //         .catch((error) => {
+  //           console.log(error);
+  //         });
+  //     }
+  //     // Notification send it to manager
+  //     // var key = localStorage.getItem("username");
+  //     // var projKey = localStorage.getItem("projName");
+  //     // var managerKey = localStorage.getItem("managerName");
+  //     await toast.promise(axios.post(
+  //       `${backendURL}/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
+  //     ), {
+  //       pending: 'Sending notification',
+  //       success: 'Notification sent successfully to your manager',
+  //       error: 'Error in sending notifications'
+  //     })
+  //       .then((res) => {
+  //         console.log(res.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //     //receiptant read notification
+  //     // const projN = localStorage.getItem("projName");
+  //     await axios
+  //       .put(`${backendURL}/api/notifications/?projectName=${project?.proj_name}`, {
+  //         read: true,
+  //       })
+  //       .then((res) => {
+  //         console.log(res.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //     // project status change
+  //     await axios
+  //       .put(`${backendURL}/api/projects/?_id=${id}`, {
+  //         proj_status: "Ready for Review",
+  //       })
+  //       .then((res) => {
+  //         console.log(res.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   }
+  // }
+
   // screens added with estimates in screen schema and project status changed as draft
-  function savedAsDraft() {
+  // function savedAsDraft() {
 
-    // if (rowsData != "") {
-    //   axios
-    //     .post(`${backendURL}/api/screens/${id}`, { rowsData })
-    //     .then((response) => {
-    //       console.log(response.data);
-    //       alert("New Screen created successfully");
+  //   // if (rowsData != "") {
+  //   //   axios
+  //   //     .post(`${backendURL}/api/screens/${id}`, { rowsData })
+  //   //     .then((response) => {
+  //   //       console.log(response.data);
+  //   //       alert("New Screen created successfully");
 
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // }
-    // // project status change
-    // axios
-    //   .put(`${backendURL}/api/projects/?_id=${id}`, {
-    //     proj_status: "Draft",
-    //   })
-    //   .then((res) => {
-    //     console.log(res.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-  }
+  //   //     })
+  //   //     .catch((error) => {
+  //   //       console.log(error);
+  //   //     });
+  //   // }
+  //   // // project status change
+  //   // axios
+  //   //   .put(`${backendURL}/api/projects/?_id=${id}`, {
+  //   //     proj_status: "Draft",
+  //   //   })
+  //   //   .then((res) => {
+  //   //     console.log(res.data);
+  //   //   })
+  //   //   .catch((error) => {
+  //   //     console.log(error);
+  //   //   });
+  // }
 
-  // total sum
-  var totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
   // select option
   estimatedMode.map((estimateOption) => estimateOption);
 
+  // Hanle Estimate Type
   const handleOptionChange = (e) => {
     var selectedOption = estimatedMode[e.target.value];
     console.log("selectedOption", selectedOption);
@@ -203,63 +158,67 @@ const Timelinecontent = () => {
     }
   };
 
-
-  function navigatePage() {
-    console.log('navigate hours', totalHours)
-    if (rowsData !== "") {
-      return navigate("/costing", { state: totalHours });
-
-    } else {
-      alert("please fill the estimate");
-    }
+  const updateTotalHours = (updatedValue) => {
+    setTotalHours(updatedValue)
   }
+
+  // function navigatePage() {
+  //   console.log('navigate hours', totalHours)
+  //   if (rowsData !== "") {
+  //     return navigate("/costing", { state: totalHours });
+
+  //   } else {
+  //     alert("please fill the estimate");
+  //   }
+  // }
 
   function navigatePageD() {
     return navigate("/dashboard");
   }
-  // Api
 
-  useEffect(() => {
-    console.log(id);
-    // axios
-    //   .get(`${backendURL}/api/projects/${id}`)
-    //   .then((res) => {
-    //     setProjectDetails([res.data]);
-    //     console.log([res.data.proj_name]);
-    //     localStorage.setItem("projName", res.data.proj_name);
-    //     localStorage.setItem("projId", res.data._id);
-    //     //console.log(res.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
 
-    dispatch(getProjectDetails(id))
-    // debugger
-    // if timeline is already done then import data
-    setLoading(true);
-    const projectScreens = axios
-      .get(`${backendURL}/api/screens/screen?project_id=${id}`)
+
+  // Submit Timelines
+  async function handleTimelinesSubmit() {
+    const submittedTimelines = await axios.post(`${backendURL}/api/screens/${id}`, {
+      timelines: timelines
+    })
       .then((response) => {
-        if (response.data) {
-          setRowsData(response.data.screens)
-        }
-        setLoading(false)
+        console.log(response.data);
+        navigate("/costing", { state: totalHours });
+        return response.data
       })
       .catch((error) => {
         console.log(error);
       });
+  }
 
-    // localStorage.setItem("projName", project?.proj_name);
-    // localStorage.setItem("projId", project?._id);
+
+  // Api
+  useEffect(() => {
+    dispatch(getProjectDetails(id))
+    setTimelineTables([<TimelineTable />])
 
   }, [id]);
+
+  useEffect(() => {
+    if (timelines.length === 0) {
+      dispatch(addTimeline({ projectId: id }));
+    }
+  }, [timelines]);
+
+  const handleAddTimeline = () => {
+    dispatch(addTimeline({ projectId: id }));
+  };
+  const handleDeleteTimeline = (timelineId) => {
+    dispatch(deleteTimeline(timelineId));
+  };
+
 
 
   return (
     <>
       <section className="nb-section">
-
         <form onSubmit={(event) => event.preventDefault()}>
           <div className="nb-dashboard-title text-center">
             <p>
@@ -276,105 +235,10 @@ const Timelinecontent = () => {
 
               ) : (
                 <div className="nb-innertimeline-wrapper">
-                  <table className="table estimation-table">
-                    <thead>
-                      <tr>
-                        <th>{project?.proj_type}</th>
-
-                        <th>
-                          {/* <div className="assign-selectbox select-timeMode">
-                            <select
-                              id="timeMode"
-                              name="users"
-                              className="assign-resources-selectbox est-timeMode-selectbox"
-                              onChange={(e) => handleOptionChange(e)}
-                            >
-                              {estimatedMode.map((option, key) => (
-                                <option key={key} value={key}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                            <img src={SelectIcon} alt="select" />
-                          </div> */}
-                          EST. (Hours)
-                        </th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    {
-                      console.log("rowsData", rowsData)
-                    }
-                    {rowsData.length === 0 ? (
-                      <tbody>
-                        {showRow ? (
-                          " "
-                        ) : (
-                          <p onClick={addTableRows}>
-                            Type here and enter your estimate
-                          </p>
-                        )}
-                        <TableRows
-                          rowsData={rowsData}
-                          rowsExtraData={rowsExtraData}
-                          deleteTableRows={deleteTableRows}
-                          handleChange={handleChange}
-                          handleExtraChange={handleExtraChange}
-                          addSubRows={addSubRows}
-                          showExtraRow={showExtraRow}
-                          addTableRows={addTableRows}
-                          deleteTableExtraRows={deleteTableExtraRows}
-                        />
-                        {showRow ? (
-                          <>
-                            <tr className="totalRow">
-                              <td>Total showrow</td>
-                              <td>{totalHours}</td>
-                              <td></td>
-                            </tr>
-                            <Button onClick={addTableRows} className="AddRow">
-                              Add new Row
-                            </Button>
-                          </>
-                        ) : (
-                          " "
-                        )}
-                      </tbody>
-                    ) : (
-
-                      <tbody>
-                        <TableRows
-                          rowsData={rowsData}
-                          rowsExtraData={rowsExtraData}
-                          deleteTableRows={deleteTableRows}
-                          handleChange={handleChange}
-                          handleExtraChange={handleExtraChange}
-                          addSubRows={addSubRows}
-                          showExtraRow={showExtraRow}
-                          addTableRows={addTableRows}
-                          deleteTableExtraRows={deleteTableExtraRows}
-                        />
-                        <Button
-                          className="add-new-row"
-                          onClick={() => addTableRows()}
-                        >
-                          <img src={addIcon} alt="add" width={10} />
-                        </Button>
-                        {
-                          <>
-                            <tr className="totalRow">
-                              <td>Total</td>
-                              <td>{totalHours}</td>
-                              <td></td>
-                            </tr>
-                            <Button onClick={addTableRows} className="AddRow">
-                              Add new Row
-                            </Button>
-                          </>
-                        }
-                      </tbody>
-                    )}
-                  </table>
+                  {timelines?.length > 0 ? (
+                    timelines?.map((timeline) => <TimelineTable key={timeline._id} timeline={timeline} totalHours={totalHours} updateTotalHours={updateTotalHours} />)
+                  ) : null
+                  }
                 </div>
               )}
 
@@ -384,19 +248,27 @@ const Timelinecontent = () => {
               <Card className="card-padding">
                 <CardContent>
                   <ul className="expertise">
-                    <li className="active">
-                      {project?.proj_name}
-                      <div className="action-btns">
-                        <span>
-                          <i className="fas fa-edit"></i>
-                        </span>
-                        <span>
-                          <i className="fas fa-times"></i>
-                        </span>
-                      </div>
-                    </li>
+                    {timelines?.map((timeline) => (
+                      <li className="active" key={timeline._id}>
+                        {timeline.timelineTitle || 'Timeline Title'}
+                        <div div className="action-btns" >
+                          {/* <button>
+                            <i className="fas fa-edit"></i>
+                          </button> */}
+                          <button onClick={() => handleDeleteTimeline(timeline._id)}>
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+
                   </ul>
-                  <div className="add-button">
+                  <div className="add-button"
+                    // onClick={() => setTimelineTables(prev => {+++
+                    //   return [...prev, <TimelineTable />]
+                    // })}
+                    onClick={handleAddTimeline}
+                  >
                     <svg
                       id="Component_21_4"
                       data-name="Component 21 – 4"
@@ -457,7 +329,7 @@ const Timelinecontent = () => {
             </Button>
             <Button
               type="submit"
-              onClick={savedAsDraft}
+              // onClick={savedAsDraft}
               variant="contained"
               className="dark-button estimate-nav-btn"
             >
@@ -467,8 +339,9 @@ const Timelinecontent = () => {
               <Button
                 type="sumit"
                 onClick={() => {
-                  addScreenNotify();
-                  navigatePage();
+                  // addScreenNotify();
+                  // navigatePage();
+                  handleTimelinesSubmit()
                 }}
                 variant="contained"
                 className="secondary-btn estimate-nav-btn"
@@ -479,7 +352,7 @@ const Timelinecontent = () => {
               <Button
                 type="sumit"
                 onClick={() => {
-                  addScreenNotify();
+                  // addScreenNotify();
                   navigatePageD();
                 }}
                 variant="contained"

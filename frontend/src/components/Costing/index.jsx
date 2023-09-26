@@ -46,7 +46,7 @@ const Costing = () => {
           console.log(error);
         });
       debugger
-      if (projectCostExist.length == 0) {
+      if (projectCostExist.length === 0) {
         const postReq = await toast.promise(
           axios.post(`${backendURL}/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`),
           {

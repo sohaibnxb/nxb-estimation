@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-const ScreenSchema = new Schema([
+const itemSchema = new Schema([
     {
-        screenName: {
+        itemName: {
             type: String,
             required: true,
         },
-        screenSections: {
+        subItems: {
             type: [String],
         },
         hours: {
@@ -16,27 +16,14 @@ const ScreenSchema = new Schema([
     },
 ], { _id: false });
 
-const ScreenListSchema = new Schema([
-    {
-        screens: {
-            type: [ScreenSchema],
-            required: true,
-        },
-        projectId: {
-            type: mongoose.Types.ObjectId,
-            ref: "Project",
-            //type: String,
-        },
-    },
-], { _id: false });
 
 const TimelineSchema = new Schema([{
     projectId: {
         type: mongoose.Types.ObjectId,
         ref: "Project",
     },
-    screens: {
-        type: [ScreenSchema],
+    items: {
+        type: [itemSchema],
         required: true,
     },
     timelineTitle: {

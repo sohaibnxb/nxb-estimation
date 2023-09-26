@@ -38,11 +38,11 @@ function App() {
     password: "",
   };
 
-  useEffect(() => {
-    if (userInfo && userToken) {
-      navigate('/dashboard')
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (userInfo && userToken) {
+  //     navigate('/dashboard')
+  //   }
+  // }, [])
 
   return (
     <>
@@ -52,6 +52,7 @@ function App() {
         <Route path="/new" element={<CreateEstimation />}></Route>
         <Route path="/costing" element={<Costing />}></Route>
         <Route path="/languages" element={<Languages />}></Route>
+        {/* <Route path="/timeline" element={<Timeline />}></Route> */}
         <Route path="/timeline/:id" element={<Timeline />}></Route>
         <Route path="*" element={<NotFoundpage />} />
       </Routes>

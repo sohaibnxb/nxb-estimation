@@ -1,45 +1,52 @@
+import { ObjectId } from 'bson';
 import Screen from "../models/screenModel.js";
 import Timeline from "../models/timelineModal.js";
 
 //add Screen
 
+
 const addTimelines = async (req, res) => {
   try {
     const timelines = req.body.timelines;
-    console.log("timelines", timelines);
+    // console.log("timelines", timelines);
     await Promise.all(
 
-      timelines.map(async timeline => {
-        await Timeline.updateOne(
-            { _id: timeline?._id },
-            timeline,
-            {
-              upsert: true,
-              setDefaultsOnInsert: true,
-            },
-          )
+      timelines.map(async (timeline, index) => {
+        if (!timeline._id || !ObjectId.isValid(timeline._id)) {
+          timeline._id = new ObjectId();
+          console.log("existing timeline", timeline)
+        }
+        console.log(`Updating timeline at index ${index}`);
+        const result = await Timeline.updateOne(
+          { _id: timeline._id },
+          { $set: timeline },
+          {
+            upsert: true,
+            setDefaultsOnInsert: true,
+          },
+        )
+        console.log(`Result of update for timeline at index ${index}:`, result)
       })
-
     )
 
     return res.status(200).json({ message: "Timeline added successfully" })
   } catch (error) {
     return res.status(400).json({ message: "Error creating timeline", error: error.message })
   }
-
-  // const screen = new Screen({
-  //   screens: req.body.rowsData,
-  //   projectId: req.params.id,
-  // });
-  // screen
-  //   .save()
-  //   .then((result) => {
-  //     res.send(result);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
 };
+
+// const screen = new Screen({
+//   screens: req.body.rowsData,
+//   projectId: req.params.id,
+// });
+// screen
+//   .save()
+//   .then((result) => {
+//     res.send(result);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 // get all screens
 
