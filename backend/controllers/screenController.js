@@ -13,19 +13,22 @@ const addTimelines = async (req, res) => {
 
       timelines.map(async (timeline, index) => {
         if (!timeline._id || !ObjectId.isValid(timeline._id)) {
-          timeline._id = new ObjectId();
+          // timeline._id = new ObjectId();
           console.log("existing timeline", timeline)
+          await Timeline.create(timeline)
         }
-        console.log(`Updating timeline at index ${index}`);
-        const result = await Timeline.updateOne(
-          { _id: timeline._id },
-          { $set: timeline },
-          {
-            upsert: true,
-            setDefaultsOnInsert: true,
-          },
-        )
-        console.log(`Result of update for timeline at index ${index}:`, result)
+        else {
+          console.log(`Updating timeline at index ${index}`);
+          const result = await Timeline.updateOne(
+            { _id: timeline._id },
+            { $set: timeline },
+            {
+              upsert: true,
+              setDefaultsOnInsert: true,
+            },
+          )
+          console.log(`Result of update for timeline at index ${index}:`, result)
+        }
       })
     )
 
@@ -48,11 +51,9 @@ const addTimelines = async (req, res) => {
 //     console.log(err);
 //   });
 
-// get all screens
-
-const getAllScreen = (req, res) => {
-  Screen.find()
-    .populate("projectId", "proj_name")
+const getAllTimelines = (req, res) => {
+  Timeline.find({})
+    .populate("costing")
     .then((result) => {
       res.send(result);
     })
@@ -60,6 +61,8 @@ const getAllScreen = (req, res) => {
       console.log(err);
     });
 };
+
+
 
 // get single screen
 
@@ -98,4 +101,4 @@ const updateScreen = (req, res) => {
       console.log(err);
     });
 };
-export { addTimelines, getAllScreen, getScreenById, deleteScreen, updateScreen };
+export { addTimelines, getAllTimelines, getScreenById, deleteScreen, updateScreen };

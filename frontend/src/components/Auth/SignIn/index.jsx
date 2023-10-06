@@ -27,13 +27,8 @@ const SignIn = () => {
     password: "",
   };
 
-  useLayoutEffect(() => {
-    if (userInfo && userToken) {
-      navigate('/dashboard')
-    }
-  }, [])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (userInfo && userToken) {
       navigate('/dashboard')
     }

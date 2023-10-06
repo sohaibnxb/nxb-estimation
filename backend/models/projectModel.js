@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Timeline from "./timelineModal.js";
+// import Timeline from "./timelineModal.js";
 const Schema = mongoose.Schema;
 
 const projectSchema = new Schema({

@@ -36,6 +36,7 @@ const TableRows = ({
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   addTableRows()
+                  e.preventDefault();
                 }
               }}
               value={itemName}
@@ -71,6 +72,7 @@ const TableRows = ({
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             addSubRows(index, subIndex)
+                            e.preventDefault()
                           }
                         }}
                         value={elem}
@@ -96,6 +98,11 @@ const TableRows = ({
               placeholder="2"
 
               onChange={(evnt) => handleChange(index, evnt)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                }
+              }}
               value={hours}
             />
           </FormControl>

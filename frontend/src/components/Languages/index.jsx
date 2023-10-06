@@ -13,7 +13,7 @@ import axios from "axios";
 import SaveIcon from '@mui/icons-material/Save';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ReactPDF, { PDFDownloadLink, PDFViewer, BlobProvider } from '@react-pdf/renderer';
-import ReactPdf from "../ReactPdf/ReactPdf";
+import VteamsTemplate from "../pdf/VteamsTemplate";
 import "./style.scss";
 import { useSelector } from "react-redux";
 
@@ -317,7 +317,7 @@ const Languages = () => {
             {/* dropdown menu */}
             <ul className={`preview-dropdown-menu ${isDropDownOpen ? 'show' : ''}`}>
               <li className="preview-dropdown-item" onClick={toggleDropdown}>
-                <BlobProvider document={generatePdf && <ReactPdf projId={project?._id} projName={project?.proj_name} />}>
+                <BlobProvider document={generatePdf && <VteamsTemplate projId={project?._id} projName={project?.proj_name} />}>
                   {({ url, loading }) => (
                     <a href={url} target="_blank" rel="noreferrer">
                       {loading ? 'Generatiing Preview...' : 'Vteams'}
@@ -327,7 +327,7 @@ const Languages = () => {
                 </BlobProvider>
               </li>
               <li className="preview-dropdown-item" onClick={toggleDropdown}>
-                <BlobProvider document={generatePdf && <ReactPdf projId={project?._id} projName={project?.proj_name} />}>
+                <BlobProvider document={generatePdf && <VteamsTemplate projId={project?._id} projName={project?.proj_name} />}>
                   {({ url, loading }) => (
                     <a href={url} target="_blank" rel="noreferrer">
                       {loading ? 'Generatiing Preview...' : 'Nextbridge'}

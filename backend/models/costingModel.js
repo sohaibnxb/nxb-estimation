@@ -1,18 +1,33 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 const Schema = mongoose.Schema;
 
 const costingSchema = new Schema({
-  totalHours: {
-    type: Number,
+  timelineTitle: {
+    type: String,
+    required: true,
   },
   hourRate: {
     type: Number,
+    required: true,
+  },
+  totalHours: {
+    type: Number,
+    required: true,
   },
   totalCost: {
     type: Number,
+    required: true,
   },
-  projectName: {
-    type: String,
+  projectId: {
+    type: mongoose.Types.ObjectId,
+    ref: "Project",
+    required: true,
+
+  },
+  timelineId: {
+    type: mongoose.Types.ObjectId,
+    ref: "Timeline",
+    required: true,
   },
 });
 

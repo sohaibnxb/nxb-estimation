@@ -79,7 +79,7 @@ const EstimatesHistory = () => {
   return (
     <>
       <div className="nb-estimatesHistory-wrapper">
-        {/* Header */}
+        {/* Header */} 
         <div className="nb-estimatesHistory-header">
           <div className="main-title">
             <h5>ESTIMATES</h5>
@@ -133,7 +133,7 @@ const EstimatesHistory = () => {
               <div className="project-meta">
                 <span>PROPOSAL FOR</span>
                 <h5>
-                  <Link to={`/timeline/${project._id}`}>
+                  <Link to={`/timeline/${project._id}`} >
                     {project?.proj_name}
                   </Link>
                 </h5>

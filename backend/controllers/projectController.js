@@ -106,7 +106,7 @@ const getAllProjectByUSer = (req, res) => {
 // get single project
 
 const getProjectById = (req, res) => {
-  Project.findById(req.params.id).populate("timelines")
+  Project.findById(req.params.id).populate({ path: 'timelines',populate:{path:'costing',model:'Costing'} })
     .then((result) => {
       res.send(result);
     })

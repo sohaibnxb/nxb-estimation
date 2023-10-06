@@ -1,11 +1,11 @@
 import express from "express";
 import {
   addTimelines,
-  deleteScreen,
-  getAllScreen,
+  deleteTimeline,
+  getAllTimelines,
   getScreenById,
   updateScreen,
-} from "../controllers/screenController.js";
+} from "../controllers/timelineController.js";
 import {
   verifyToken,
   admin,
@@ -15,10 +15,10 @@ import {
 
 const router = express.Router();
 
-router.get("/", getAllScreen);
-router.post("/:id", addTimelines);
+router.get("/", getAllTimelines);
+router.post("/", addTimelines);
 router.get("/screen", getScreenById);
-router.delete("/:id", deleteScreen);
+router.delete("/:id", deleteTimeline);
 router.put("/:id", updateScreen);
 
 export default router;

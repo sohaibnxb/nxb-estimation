@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, CardContent, CircularProgress } from "@mui/material";
+import { Button, Card, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import SelectIcon from "../../../assets/images/select.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import TableRows from "./TableRows";
 import TimelineTable from "./TimlineTable";
 
-import { getProjectDetails } from "../redux/timelineActions";
+import { getProjectDetails, submitTimelines } from "../redux/timelineActions";
 
 import addIcon from "../../../assets/images/add.svg"
 import { addTimeline, deleteTimeline } from "../redux/timelineSllice";
@@ -22,7 +22,7 @@ const Timelinecontent = () => {
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
   const [timelineTables, setTimelineTables] = useState([])
 
-  const [totalHours, setTotalHours] = useState()
+
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -158,9 +158,7 @@ const Timelinecontent = () => {
     }
   };
 
-  const updateTotalHours = (updatedValue) => {
-    setTotalHours(updatedValue)
-  }
+
 
   // function navigatePage() {
   //   console.log('navigate hours', totalHours)
@@ -180,17 +178,18 @@ const Timelinecontent = () => {
 
   // Submit Timelines
   async function handleTimelinesSubmit() {
-    const submittedTimelines = await axios.post(`${backendURL}/api/screens/${id}`, {
-      timelines: timelines
-    })
-      .then((response) => {
-        console.log(response.data);
-        navigate("/costing", { state: totalHours });
-        return response.data
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // const submittedTimelines = await axios.post(`${backendURL}/api/timelines/`, {
+    //   timelines: timelines
+    // })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     navigate("/costing",);
+    //     return response.data
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    dispatch(submitTimelines(timelines)).then((res) => navigate('/costing'))
   }
 
 
@@ -202,7 +201,7 @@ const Timelinecontent = () => {
   }, [id]);
 
   useEffect(() => {
-    if (timelines.length === 0) {
+    if (timelines?.length === 0) {
       dispatch(addTimeline({ projectId: id }));
     }
   }, [timelines]);
@@ -210,10 +209,33 @@ const Timelinecontent = () => {
   const handleAddTimeline = () => {
     dispatch(addTimeline({ projectId: id }));
   };
+
   const handleDeleteTimeline = (timelineId) => {
     dispatch(deleteTimeline(timelineId));
   };
 
+  // Confirmation Modal
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [backendId, setBackendId] = useState(null);
+
+  const handleDeleteClick = (frontendId, backendId, event) => {
+
+    setSelectedId(frontendId);
+    setBackendId(backendId)
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDeleteConfirmed = () => {
+    // const updatedData = data.filter(item => item.id !== selectedId);
+    // setData(updatedData);
+    dispatch(deleteTimeline(selectedId));
+    setDialogOpen(false);
+  };
 
 
   return (
@@ -236,7 +258,7 @@ const Timelinecontent = () => {
               ) : (
                 <div className="nb-innertimeline-wrapper">
                   {timelines?.length > 0 ? (
-                    timelines?.map((timeline) => <TimelineTable key={timeline._id} timeline={timeline} totalHours={totalHours} updateTotalHours={updateTotalHours} />)
+                    timelines?.map((timeline) => <TimelineTable key={timeline.id} timeline={timeline} />)
                   ) : null
                   }
                 </div>
@@ -249,13 +271,15 @@ const Timelinecontent = () => {
                 <CardContent>
                   <ul className="expertise">
                     {timelines?.map((timeline) => (
-                      <li className="active" key={timeline._id}>
+                      <li className="active" key={timeline.id}>
                         {timeline.timelineTitle || 'Timeline Title'}
                         <div div className="action-btns" >
                           {/* <button>
                             <i className="fas fa-edit"></i>
                           </button> */}
-                          <button onClick={() => handleDeleteTimeline(timeline._id)}>
+                          <button
+                            onClick={(event) => handleDeleteClick(timeline.id, timeline._id, event)}
+                          >
                             <i className="fas fa-times"></i>
                           </button>
                         </div>
@@ -364,8 +388,53 @@ const Timelinecontent = () => {
           </div>
         </form >
       </section >
+
+      <ConfirmationDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onDelete={handleDeleteConfirmed}
+        id={backendId}
+      />
     </>
   );
 };
 
 export default Timelinecontent;
+
+
+
+const ConfirmationDialog = ({ open, onClose, onDelete, id }) => {
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${backendURL}/api/timelines/${id}`);
+      onDelete();
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        {"Confirm Deletion"}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          Are you sure you want to delete this timeline? <br /> This action cannot be undone.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{ padding: '1rem 1.5rem' }}>
+        <Button onClick={onClose} color="inherit" size="small">Cancel</Button>
+        <Button onClick={handleDelete} variant="contained" color="error" size="small" autoFocus>
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}

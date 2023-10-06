@@ -18,13 +18,14 @@ const ReactPdf = ({ projId, projName }) => {
 
     const [project, setProject] = useState(null)
     const [languages, setLanguages] = useState(null)
-    const [projectCost, setProjectCost] = useState(null)
+    // const [projectCost, setProjectCost] = useState(null)
     const [projectScreens, setProjectScreens] = useState(null)
 
     const sum = projectScreens?.screens?.reduce((accumulator, screen) => {
         return accumulator + parseInt(screen.hours);
     }, 0)
 
+    const projectCost = project?.timelines?.reduce((total, item) => (total + item.costing[0].totalCost), 0)
     // const notes = project?.notes.split(/(?<=\.)\n|(?<=\.) /);
 
     // const notes = project?.notes.split(/[.\n]+/);
@@ -36,40 +37,38 @@ const ReactPdf = ({ projId, projName }) => {
         console.log("projId", projId);
         try {
             const response = await axios.get(`${backendURL}/api/projects/${projId}`)
-            console.log("proj response", response);
+            console.log("proj response", response.data);
             setProject(response.data)
         } catch (error) {
             console.log(error);
         }
     }
 
-    const fetchCosting = async () => {
-        // const projName = localStorage.getItem("projName")
+    // const fetchCosting = async () => {
+    //     // const projName = localStorage.getItem("projName")
 
-        try {
-            const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${projName}`)
-            console.log(projectCost.data)
-            setProjectCost(projectCost.data[0])
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    const fetchScreens = async () => {
-        // const projId = localStorage.getItem("projId")
-        try {
-            const projectScreens = await axios.get(`${backendURL}/api/screens/screen?project_id=${projId}`)
-            console.log("project screens", projectScreens.data)
-            setProjectScreens(projectScreens.data)
-        } catch (error) {
-            console.log(error);
-        }
+    //     try {
+    //         const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${projName}`)
+    //         console.log(projectCost.data)
+    //         setProjectCost(projectCost.data[0])
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+    // const fetchScreens = async () => {
+    //     // const projId = localStorage.getItem("projId")
+    //     try {
+    //         const projectScreens = await axios.get(`${backendURL}/api/screens/screen?project_id=${projId}`)
+    //         console.log("project screens", projectScreens.data)
+    //         setProjectScreens(projectScreens.data)
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
 
-    }
+    // }
 
     useEffect(() => {
         fetchProject()
-        fetchCosting()
-        fetchScreens()
     }, [])
 
     Font.register({
@@ -155,6 +154,7 @@ const ReactPdf = ({ projId, projName }) => {
                 position: 'absolute',
                 bottom: '25%',
                 left: '12%',
+                right: '12%',
 
                 title: {
                     fontSize: 40,
@@ -269,7 +269,7 @@ const ReactPdf = ({ projId, projName }) => {
                 borderCollapse: 'collapse',
                 head: {
                     border: '1px solid #E5E5E5',
-                    borderBottom: 'unset',
+                    borderBottom: 0,
                     borderCollapse: 'collapse',
                     backgroundColor: '#037DD4',
                     color: '#ffffff',
@@ -293,6 +293,7 @@ const ReactPdf = ({ projId, projName }) => {
                 tr: {
                     display: 'flex',
                     flexDirection: 'row',
+                    borderTop: '1px solid #E5E5E5',
                 },
                 td: {
                     // border: '1px solid #E5E5E5',
@@ -421,35 +422,42 @@ const ReactPdf = ({ projId, projName }) => {
                     <View>
                         <Text style={styles.heading}>Timeline <Text style={styles.heading.bold}>Breakdown</Text></Text>
                         {/* Timeline Table */}
-                        <View style={styles.timelinePage.timelineTable}>
-                            <View style={styles.timelinePage.timelineTable.head}>
-                                <View style={[styles.timelinePage.timelineTable.td, { width: '80%' }]}><Text>Tasks</Text></View>
-                                <View style={[styles.timelinePage.timelineTable.td, { borderLeft: '1px solid #e5e5e5', width: '20%', textAlign: 'center' }]}><Text>Estimation</Text><Text>(Hours)</Text></View>
-                            </View>
+                        {
+                            project?.timelines?.map((timeline) => (
+                                <View key={timeline?._id} style={{marginBottom:"20px"}}>
+                                    <View style={styles.timelinePage.timelineTable}>
+                                        <View style={styles.timelinePage.timelineTable.head}>
+                                            <View style={[styles.timelinePage.timelineTable.td, { width: '80%' }]}><Text>{timeline?.timelineTitle}</Text></View>
+                                            <View style={[styles.timelinePage.timelineTable.td, { borderLeft: '1px solid #e5e5e5', width: '20%', textAlign: 'center' }]}><Text>Estimation</Text><Text>(Hours)</Text></View>
+                                        </View>
 
-                            <View style={styles.timelinePage.timelineTable.body}>
+                                        <View style={styles.timelinePage.timelineTable.body}>
 
-                                {
-                                    projectScreens?.screens?.map(screen => {
-                                        return (
-                                            <View style={styles.timelinePage.timelineTable.tr} key={screen?._id}>
-                                                <View style={[styles.timelinePage.timelineTable.td, { width: '81%', borderRight: '1px solid #e5e5e5', }]}>
-                                                    <Text>{screen?.screenName}</Text>
-                                                    {screen?.screenSections?.map((subScreen) => <Text style={{ marginLeft: "8px" }}> - {subScreen}</Text>)}
-                                                </View>
-                                                <View style={[styles.timelinePage.timelineTable.td, { width: '20%', textAlign: 'center' }]}><Text>{screen?.hours}</Text></View>
-                                            </View>
-                                        )
-                                    })
-                                }
+                                            {
+                                                timeline?.items?.map((item, index) => {
+                                                    return (
+                                                        <View style={styles.timelinePage.timelineTable.tr} key={index} >
+                                                            <View style={[styles.timelinePage.timelineTable.td, { width: '81%', borderRight: '1px solid #e5e5e5', }]}>
+                                                                <Text>{item?.itemName}</Text>
+                                                                {item?.subItems?.map((subItem) => <Text style={{ marginLeft: "8px" }}> - {subItem}</Text>)}
+                                                            </View>
+                                                            <View style={[styles.timelinePage.timelineTable.td, { width: '20%', textAlign: 'center' }]}><Text>{item?.hours}</Text></View>
+                                                        </View>
+                                                    )
+                                                })
+                                            }
 
-                            </View>
-                        </View>
+                                        </View>
+                                    </View>
 
-                        <View style={styles.timelinePage.timelineTable.total}>
-                            <View style={[styles.timelinePage.timelineTable.td, { width: '80%', textAlign: 'right' }]}><Text>Total</Text></View>
-                            <View style={[styles.costingPage.costingTable.td, { borderLeft: '1px solid #e5e5e5', width: '20%', textAlign: 'center' }]}><Text>{sum}</Text></View>
-                        </View>
+                                    <View style={styles.timelinePage.timelineTable.total}>
+                                        <View style={[styles.timelinePage.timelineTable.td, { width: '80%', textAlign: 'right' }]}><Text>Total</Text></View>
+                                        <View style={[styles.costingPage.costingTable.td, { borderLeft: '1px solid #e5e5e5', width: '20%', textAlign: 'center' }]}><Text>{timeline?.totalHours}</Text></View>
+                                    </View>
+                                </View>
+                            ))
+                        }
+
                     </View>
 
                 </View>
@@ -474,7 +482,7 @@ const ReactPdf = ({ projId, projName }) => {
                             <Text >The detailed breakdown of the timeline is given on the next page.</Text>
                         </View>
                         <View style={styles.costingPage.totalCost.costSec}>
-                            <Text >$ <Text style={{ fontWeight: 'bold' }}>{projectCost?.totalCost}</Text></Text>
+                            <Text >$ <Text style={{ fontWeight: 'bold' }}>{projectCost}</Text></Text>
                         </View>
                     </View>
 
@@ -491,16 +499,21 @@ const ReactPdf = ({ projId, projName }) => {
                         </View>
 
                         <View style={styles.costingPage.costingTable.body}>
-                            <View style={styles.costingPage.costingTable.tr}>
-                                <View style={[styles.costingPage.costingTable.td, { width: '40%', borderRight: '1px solid #e5e5e5' }]}><Text>{projectCost?.projectName}</Text></View>
-                                <View style={[styles.costingPage.costingTable.td, { width: '20%', borderRight: '1px solid #e5e5e5', textAlign: 'center' }]}><Text>{projectCost?.hourRate}/Hour</Text></View>
-                                <View style={[styles.costingPage.costingTable.td, { width: '20%', borderRight: '1px solid #e5e5e5', textAlign: 'center' }]}><Text>{(projectCost?.totalCost) / (projectCost?.hourRate)}</Text></View>
-                                <View style={[styles.costingPage.costingTable.td, { width: '20%', textAlign: 'center' }]}><Text>${projectCost?.totalCost}</Text></View>
-                            </View>
+                            {
+                                project?.timelines?.map((timeline) => (
+                                    <View style={styles.costingPage.costingTable.tr}>
+                                        <View style={[styles.costingPage.costingTable.td, { width: '40%', borderRight: '1px solid #e5e5e5' }]}><Text>{timeline?.timelineTitle}</Text></View>
+                                        <View style={[styles.costingPage.costingTable.td, { width: '20%', borderRight: '1px solid #e5e5e5', textAlign: 'center' }]}><Text>{timeline?.costing[0]?.hourRate}/Hour</Text></View>
+                                        <View style={[styles.costingPage.costingTable.td, { width: '20%', borderRight: '1px solid #e5e5e5', textAlign: 'center' }]}><Text>{(timeline?.costing[0]?.totalHours)}</Text></View>
+                                        <View style={[styles.costingPage.costingTable.td, { width: '20%', textAlign: 'center' }]}><Text>${timeline?.costing[0]?.totalCost}</Text></View>
+                                    </View>
+
+                                ))
+                            }
                         </View>
                         <View style={styles.costingPage.costingTable.total}>
                             <View style={[styles.costingPage.costingTable.td, { width: '80%', borderRight: '1px solid #e5e5e5', textAlign: 'right' }]}><Text>Total</Text></View>
-                            <View style={[styles.costingPage.costingTable.td, { width: '20%', textAlign: 'center' }]}><Text>${projectCost?.totalCost}</Text></View>
+                            <View style={[styles.costingPage.costingTable.td, { width: '20%', textAlign: 'center' }]}><Text>${projectCost}</Text></View>
                         </View>
                     </View>
 

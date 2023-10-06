@@ -7,12 +7,11 @@ import addIcon from "../../../assets/images/add.svg"
 import TableRows from "./TableRows";
 import { addSubRowsReducer, addTableRowsReducer, deleteTableExtraRowsReducer, deleteTableRowsReducer, updateItemValuesReducer, updateSubItemValuesReducer, updateTimelineTitle } from '../redux/timelineSllice';
 
-const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
+const TimlineTable = ({ timeline = null, }) => {
 
     const timelineItems = _.cloneDeep(timeline?.items)
 
 
-    console.log("timeline items", timelineItems);
     const [rowsData, setRowsData] = useState(timelineItems || []);
     const [rowsExtraData, setRowsExtraData] = useState([]);
     // const [showRow, setShowRow] = useState(false);
@@ -21,7 +20,7 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
 
     const dispatch = useDispatch()
 
-    const timelineId = timeline?._id;
+    const timelineId = timeline?.id;
 
 
 
@@ -65,7 +64,7 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
     };
     // change input and getting values
     const handleChange = async (index, evnt) => {
-        // evnt.preventDefault();
+
         const { name, value } = evnt.target;
         const rowsInput = [...rowsData];
         rowsInput[index][name] = value;
@@ -83,12 +82,9 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
     };
 
     // total sum
-    // var totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
-    updateTotalHours(rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0))
+    // let totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
 
 
-    const { timelines } = useSelector(state => state.timeline)
-    console.log("timlines ", timelines);
     return (
         <table className="table estimation-table">
             <thead>
@@ -100,6 +96,13 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
                             defaultValue={timeline?.timelineTitle}
                             onChange={(event) => handleTitleChange(event)}
                             inputProps={{ 'aria-label': 'TYPE TO ADD TITLE', sx: { p: 0, '&::placeholder': { opacity: 1, } } }}
+                            onKeyPress={(e) => {
+                                e.stopPropagation()
+                                if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                }
+                            }
+                            }
                         />
                     </th>
 
@@ -148,7 +151,7 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
                     <>
                         <tr className="totalRow">
                             <td>Total</td>
-                            <td>{totalHours}</td>
+                            <td>{timeline?.totalHours}</td>
                             <td></td>
                         </tr>
                         <Button onClick={addTableRows} className="AddRow">
@@ -181,7 +184,7 @@ const TimlineTable = ({ timeline = null, totalHours, updateTotalHours }) => {
                         <>
                             <tr className="totalRow">
                                 <td>Total</td>
-                                <td>{totalHours}</td>
+                                <td>{timeline?.totalHours}</td>
                                 <td></td>
                             </tr>
                             <Button onClick={addTableRows} className="AddRow">

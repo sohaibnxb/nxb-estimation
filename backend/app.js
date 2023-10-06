@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import tempRoutes from "./routes/tempRoutes.js";
 import projRoutes from "./routes/projRoutes.js";
-import screenRoutes from "./routes/screenRoutes.js";
+import timelineRoutes from "./routes/timelineRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import revisionRoutes from "./routes/revisionRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
@@ -27,7 +27,7 @@ app.get("/", (req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/temp", tempRoutes);
 app.use("/api/projects", projRoutes);
-app.use("/api/screens", screenRoutes);
+app.use("/api/timelines", timelineRoutes);
 app.use("/api/revisions", revisionRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/notifications", notificationRoutes);
