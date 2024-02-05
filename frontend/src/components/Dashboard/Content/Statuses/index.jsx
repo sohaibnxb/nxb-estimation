@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import API from "../../../../utils/api";
+import { useSelector } from "react-redux";
 
 const Statuses = () => {
   const [completedCount, setCompletedCount] = useState([]);
@@ -8,49 +9,61 @@ const Statuses = () => {
   const [completedNCount, setCompletedNCount] = useState([]);
   const [pendingNCount, setPendingNCount] = useState([]);
   const [draftNCount, setDraftNCount] = useState([]);
-  // const URL = process.env.REACT_APP_SERVER_URL;
-  // const backendURL = "http://localhost:5000";
-  const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+  const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
   const comp = `${backendURL}/api/projects/comp`;
   const pending = `${backendURL}/api/projects/pending`;
   const draft = `${backendURL}/api/projects/draft`;
   const Ncomp = `${backendURL}/api/projects/Ncomp`;
   const Npending = `${backendURL}/api/projects/Npending`;
   const Ndraft = `${backendURL}/api/projects/Ndraft`;
+  const { projects }  = useSelector(state => state.dashboard);
+  const [nxbProjectsCount, setNxbProjectsCount] = useState(0);
+  const [vTeamsProjectsCount, setVTeamsProjectsCount] = useState(0);
+
+  useEffect(() => {
+    const vTeamsProjects = projects.filter(project => project.proposal_for === "v-teams").length;
+    const nxbProjects = projects.filter(project => project.proposal_for === "nxb").length;
+    setNxbProjectsCount(nxbProjects);
+    setVTeamsProjectsCount(vTeamsProjects);
+  }, [projects]);
+
   useEffect(() => {
 
-    axios.get(comp)
+    API.get(comp)
       .then((response) => {
+        console.log("COMPLETED: ", response);
         setCompletedCount(response.data)
       })
       .catch((error) => console.log(error));
 
-    axios.get(pending)
+    API.get(pending)
       .then((response) => {
+        console.log("PENDING: ", response);
         setPendingCount(response.data)
 
       })
       .catch((error) => console.log(error));
 
-    axios.get(draft)
+    API.get(draft)
       .then((response) => {
+        console.log("DRAFT : ", response);
         setDraftCount(response.data)
       })
       .catch((error) => console.log(error));
 
-    axios.get(Ncomp)
+    API.get(Ncomp)
       .then((response) => {
         setCompletedNCount(response.data)
       })
       .catch((error) => console.log(error));
 
-    axios.get(Npending)
+    API.get(Npending)
       .then((response) => {
         setPendingNCount(response.data)
       })
       .catch((error) => console.log(error));
 
-    axios.get(Ndraft)
+    API.get(Ndraft)
       .then((response) => {
         setDraftNCount(response.data)
       })
@@ -71,7 +84,8 @@ const Statuses = () => {
                 <h6>vteams</h6>
               </div>
               <div className="completed-count count">
-                <span>{completedCount}</span>
+                {/* <span>{completedCount}</span> */}
+                <span>{vTeamsProjectsCount}</span>
               </div>
               <div className="pending-count count">
                 <span>{pendingCount}</span>
@@ -85,7 +99,8 @@ const Statuses = () => {
                 <h6>Nextbridge</h6>
               </div>
               <div className="completed-count count">
-                <span>{completedNCount}</span>
+                {/* <span>{completedNCount}</span> */}
+                <span>{nxbProjectsCount}</span>
               </div>
               <div className="pending-count count">
                 <span>{pendingNCount}</span>
@@ -94,12 +109,12 @@ const Statuses = () => {
                 <span>{draftNCount}</span>
               </div>
             </div>
-            {/* <div className="team-statuses label-statuses">
+            <div className="team-statuses label-statuses">
               <div className="title">
-                
+
               </div>
               <div className="completed-label count">
-                  <p>Completed</p>
+                <p>Completed</p>
               </div>
               <div className="pending-label count">
                 <p>Pending for review</p>
@@ -107,7 +122,7 @@ const Statuses = () => {
               <div className="draft-label count">
                 <p>Draft</p>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

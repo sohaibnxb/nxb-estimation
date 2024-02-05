@@ -2,6 +2,7 @@ import express from "express";
 import {
   addTimelines,
   deleteTimeline,
+  editTimelinesAccess,
   getAllTimelines,
   getScreenById,
   updateScreen,
@@ -15,10 +16,11 @@ import {
 
 const router = express.Router();
 
-router.get("/", getAllTimelines);
-router.post("/", addTimelines);
-router.get("/screen", getScreenById);
-router.delete("/:id", deleteTimeline);
-router.put("/:id", updateScreen);
+router.get("/", verifyToken, getAllTimelines);
+router.post("/", verifyToken, addTimelines);
+router.get("/screen", verifyToken, getScreenById);
+router.delete("/:id", verifyToken, deleteTimeline);
+router.put("/:id", verifyToken, updateScreen);
+router.patch("/update-access", verifyToken, editTimelinesAccess);
 
 export default router;

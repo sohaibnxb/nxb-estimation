@@ -7,10 +7,9 @@ const initialState = {
     timelines: null,
     projectDeliverables: null,
     loading: false,
-    error: null
+    error: null,
+    projectOwner: null,
 }
-
-
 
 const timelineSlice = createSlice(
     {
@@ -107,8 +106,18 @@ const timelineSlice = createSlice(
                 state.loading = true;
             })
                 .addCase(getProjectDetails.fulfilled, (state, action) => {
-                    state.project = action.payload;
-                    state.timelines = action.payload.timelines;
+                    const { project, userID, FullName, role } = action.payload;
+                    // state.project = action.payload;
+                    // state.timelines = action.payload.timelines;
+                    state.project = project;
+                    // state.timelines = project.timelines;
+                    // modifiy 
+                    const timelinesData = project.timelines;
+                    const projectOwner = project.prepared_by;
+                    const timelines =  getTimelinesHelper(timelinesData, userID, FullName, projectOwner, role);
+                    state.timelines = timelines;
+                    state.projectOwner = projectOwner;
+                    // modifiy 
                     state.loading = false;
                 })
                 .addCase(getProjectDetails.rejected, (state, action) => {
@@ -130,6 +139,15 @@ const timelineSlice = createSlice(
         }
     }
 )
+
+const getTimelinesHelper = (timelinesData, userID, currentUser, projectOwner, role) => {
+    if((projectOwner !== currentUser || role === "resource") && role !== "admin") {
+        let allowedTimelines = timelinesData.filter(timeline => timeline.access_to.includes(userID));
+        return allowedTimelines;
+      } else {
+        return timelinesData;
+    }
+}
 
 
 export const { addTimeline, deleteTimeline, updateTimelineTitle, addTableRowsReducer, addSubRowsReducer, deleteTableRowsReducer, deleteTableExtraRowsReducer, updateItemValuesReducer, updateSubItemValuesReducer } = timelineSlice.actions;

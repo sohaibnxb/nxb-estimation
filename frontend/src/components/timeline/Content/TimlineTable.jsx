@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react'
+import { useDispatch, } from 'react-redux';
 
 import _ from 'lodash'
-import { Button, Card, CardContent, CircularProgress, FormControl, Input, InputBase, TextField } from "@mui/material";
+import { Button, InputBase } from "@mui/material";
 import addIcon from "../../../assets/images/add.svg"
 import TableRows from "./TableRows";
 import { addSubRowsReducer, addTableRowsReducer, deleteTableExtraRowsReducer, deleteTableRowsReducer, updateItemValuesReducer, updateSubItemValuesReducer, updateTimelineTitle } from '../redux/timelineSllice';
@@ -21,8 +21,6 @@ const TimlineTable = ({ timeline = null, }) => {
     const dispatch = useDispatch()
 
     const timelineId = timeline?.id;
-
-
 
     const handleTitleChange = (event) => {
         dispatch(updateTimelineTitle({ timelineId, title: event.target.value }))
@@ -80,10 +78,6 @@ const TimlineTable = ({ timeline = null, }) => {
         setRowsData([...temp]);
         dispatch(updateSubItemValuesReducer({ timelineId, index, value, subIndex }))
     };
-
-    // total sum
-    // let totalHours = rowsData?.reduce((total, item) => (total + (item.hours ? parseInt(item.hours) : 0)), 0);
-
 
     return (
         <table className="table estimation-table">

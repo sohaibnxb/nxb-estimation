@@ -39,9 +39,31 @@ const addTimelines = async (req, res) => {
     }
 };
 
+// edit timeline access
+const editTimelinesAccess = async (req, res) => {
+    const { timelineId, userId } = req.body;
+    try {
+        if(!timelineId || !ObjectId.isValid(timelineId)) {
+            return res.status(204).json({ message: "No timeline Exists" });
+        }
+        let existedTimeline = await Timeline.findById(timelineId);
+        if(!existedTimeline) {
+            res.status(404).json({message: "Timeline not found"});
+        }
+        // Check if the user ID is already in the access_to array
+        if(!existedTimeline.access_to.includes(userId)) {
+            existedTimeline.access_to.push(userId);
+            await existedTimeline.save();
+            res.status(200).json({message: "Access granted successfully"});
+        } else {
+            res.status(200).json({message: "User already has access to the timeline"});
+        }
+    } catch (error) {
+        console.error('Error updating timeline access:', error.message);
+    }
+}
 
 // delete screen
-
 const deleteTimeline = async (req, res) => {
     const timelineId = req.params.id
     try {
@@ -50,7 +72,7 @@ const deleteTimeline = async (req, res) => {
             return res.status(200).json({ message: "No timeline Exists" })
         }
         else {
-            const deletedTimeline = await Timeline.findByIdAndRemove(req.params.id)
+            const deletedTimeline = await Timeline.findByIdAndDelete(timelineId);
             return res.status(200).json({ message: "Timeline deleted successfully", deletedTimeline });
         }
     } catch (error) {
@@ -59,9 +81,7 @@ const deleteTimeline = async (req, res) => {
 
 };
 
-
 // get all screens
-
 const getAllTimelines = (req, res) => {
     Timeline.find()
         .populate("costing")
@@ -110,4 +130,4 @@ const updateScreen = (req, res) => {
             console.log(err);
         });
 };
-export { addTimelines, deleteTimeline, getAllTimelines, getScreenById, deleteScreen, updateScreen };
+export { addTimelines, deleteTimeline, getAllTimelines, getScreenById, deleteScreen, updateScreen, editTimelinesAccess };

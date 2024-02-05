@@ -19,14 +19,14 @@ import {
 
 const router = express.Router();
 
-router.post("/signin", level2, level1, authUser);
+router.post("/signin", authUser);
 router.post('/register', registerUser);
 router.get("/sortUser", verifyToken, sortUsers);
 router.get("/", verifyToken, getAllusers);
-router.get("/resources", getAllresouces);
-router.get("/selectedUser", getSelectedUser);
+router.get("/resources", verifyToken, getAllresouces);
+router.get("/selectedUser", verifyToken, getSelectedUser);
 router.get("/:id", verifyToken, getUserById);
 router.delete("/:id", verifyToken, deleteUser);
-router.put("/:id", updateUser);
+router.put("/:id", verifyToken, updateUser);
 
 export default router;

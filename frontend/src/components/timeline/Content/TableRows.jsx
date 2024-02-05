@@ -1,26 +1,22 @@
-import React from "react";
 import {
-  Box,
-  Grid,
   FormControl,
   TextField,
   Button,
-  textFieldClasses,
 } from "@mui/material";
+
 
 import closeIcon from "../../../assets/images/close.svg"
 import addIcon from "../../../assets/images/add.svg"
 const TableRows = ({
   rowsData,
-  rowsExtraData,
   deleteTableRows,
   handleChange,
   addSubRows,
-  showExtraRow,
   handleExtraChange,
   deleteTableExtraRows,
   addTableRows
 }) => {
+
   return rowsData?.map((data, index) => {
     const { itemName, hours, subItems } = data;
     return (
@@ -42,6 +38,13 @@ const TableRows = ({
               value={itemName}
             />
           </FormControl>
+          {/* <Button
+            className="secondary-button add-subRow"
+            onClick={() => deleteTableRows(index)}
+            style={{marginRight: '30px'}}
+          >
+            <img src={closeIcon} alt="add" width={8} />
+          </Button> */}
           <Button
             className="secondary-button add-subRow"
             onClick={() => addSubRows(index)}
@@ -78,10 +81,16 @@ const TableRows = ({
                         value={elem}
                       />
                     </FormControl>
+                    {/* <span
+                      className="subdata"
+                      onClick={() => deleteTableExtraRows(index, subIndex)}
+                    ></span> */}
                     <span
                       className="subdata"
                       onClick={() => deleteTableExtraRows(index, subIndex)}
-                    ></span>
+                    >
+                      <img src={closeIcon} alt="add" width={8} />
+                    </span>
                   </td>
                 </>
               );
@@ -111,21 +120,10 @@ const TableRows = ({
         <td>
           <Button
             className="secondary-button  timeline-action-btn"
-            onClick={(e) => deleteTableRows(index)}
+            onClick={() => deleteTableRows(index)}
           >
             <img src={closeIcon} alt="close" width={8} />
           </Button>
-          {/* <Button
-            className="secondary-button timeline-action-btn"
-            onClick={() => addTableRows()}
-          >
-            <img src={addIcon} alt="add" width={12} />
-          </Button> */}
-
-          {/* <span
-              className="data"
-              onClick={(e) => deleteTableRows(index)}
-            ></span> */}
         </td>
       </tr>
     )

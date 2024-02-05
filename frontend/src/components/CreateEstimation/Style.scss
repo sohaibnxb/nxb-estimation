@@ -5,14 +5,63 @@
   max-width: 1130px;
   display: flex;
   gap: 30px;
-  margin: 60px auto 0px;
+  margin: auto;
+
+  
 
   .estimate-form-container {
-    // padding: 110px 130px 130px 130px;
-    padding: 80px 120px 80px 120px;
+    // padding: 20px 120px 20px 120px;
+    padding: 55px 120px 20px 120px;
     box-shadow: 0px 3px 6px map-get($base_colors, "shadow-color");
     border-radius: 8px;
     background-color: map-get($base_colors, "white");
+    max-height: 542px;
+    overflow-y: auto;
+
+    @media (min-height:800px) {
+      padding: 80px 100px 80px 100px;
+      max-height: max-content;
+    }
+
+    .team-selection {
+      .team-autocomplete {
+        font-family: map-get($font-family, "regular");
+        font-size: map-get($font-sizes, "xsmall") - 1;
+        color: map-get($base_colors, "search-color");
+        margin-top: calculateRem(-2px);
+        padding-left: calculateRem(10px);
+        background: map-get($base_colors, "white");
+        @include size(30px, 140px);
+        border-color: map-get($base_colors, "input-border-color");
+        // outline: 1px solid map-get($base_colors, "input-border-color");
+        border-width: 1px;
+        border-radius: calculateRem(8px);
+        &:hover,
+        &:focus,
+        &:active {
+          color: map-get($base_colors, "primary-color");
+          outline: 1px solid map-get($base_colors, "input-border-color");
+        }
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 50px;
+        background-color: #f3f3f4;
+        font-size: 16px;
+
+        &:hover {
+          background-color: #fff;
+          border: 4px solid #e5e5e5;
+        }
+      }
+      img {
+        position: absolute;
+        right: 16px;
+        top: 44px;
+        width: 14px;
+      }
+    }
 
     .estimation-form-group {
       display: flex;

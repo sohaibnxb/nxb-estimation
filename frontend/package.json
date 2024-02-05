@@ -1,12 +1,15 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "nxb-estimation-frontend",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@dnd-kit/core": "4.0.3",
-    "@dnd-kit/modifiers": "4.0.0",
-    "@dnd-kit/sortable": "5.1.0",
-    "@dnd-kit/utilities": "3.0.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@hookform/resolvers": "^2.9.10",
@@ -14,29 +17,18 @@
     "@mui/material": "^5.13.7",
     "@react-pdf/renderer": "^3.1.9",
     "@reduxjs/toolkit": "^1.9.5",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "array-move": "^4.0.0",
     "axios": "^1.2.3",
     "formik": "^2.2.9",
     "immer": "^10.0.2",
-    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "material-ui-search-bar": "^1.0.0",
     "moment": "^2.29.4",
     "namor": "^1.1.2",
     "react": "^18.2.0",
-    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.0",
-    "react-pdf": "^6.2.2",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.6.1",
-    "react-scripts": "5.0.1",
     "react-select": "^5.7.0",
-    "react-sortable-hoc": "^2.0.0",
-    "react-table": "latest",
     "react-toastify": "^9.1.2",
     "redux-persist": "^6.0.0",
     "sass": "^1.57.1",
@@ -46,28 +38,14 @@
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "vite": "^5.0.8"
   }
 }

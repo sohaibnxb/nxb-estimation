@@ -1,4 +1,5 @@
 import Project from "../models/projectModel.js";
+import { ObjectId } from "bson";
 
 //create Project
 
@@ -31,11 +32,18 @@ const addProject = (req, res) => {
   ) {
     return res.status(422).json({ error: "please fill the fields properly" });
   }
+
+  let access_to = [];
+  if(req.query.access_to) {
+    access_to.push(req.body.access_to);
+  }
+  
   Project.findOne({ proj_name: proj_name })
     .then((projectExist) => {
       if (projectExist) {
         return res.status(422).json({ error: "Project already exist" });
       }
+
       const proj = new Project({
         proj_name: proj_name,
         proj_type: proj_type,
@@ -50,6 +58,7 @@ const addProject = (req, res) => {
         resource_name: resource_name,
         notes: notes,
         questions: questions,
+        access_to: access_to ? access_to : []
       });
       proj
         .save()
@@ -66,22 +75,67 @@ const addProject = (req, res) => {
 };
 
 // get all projects by template
+const getAllProject = async (req, res) => {
+try {
+    const projectsByManger = await Project.find({ prepared_by: req.query.prepared_by });
+    const allProjects = await Project.find({});
+    let accessFilteredProjects = allProjects.filter(project => project.access_to.includes(req.query.id));
+  
+    let collectedProjects = [...projectsByManger, ...accessFilteredProjects];
+    console.log("COLLECTED PROJECTS: ", collectedProjects);
+    res.send(collectedProjects);
+} catch (error) {
+  console.log(error);
+}
 
-const getAllProject = (req, res) => {
-  Project.find({ prepared_by: req.query.prepared_by })
-    // .populate("temp_id", "ttype")
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  // Project.find({ prepared_by: req.query.prepared_by })
+  //   // .populate("temp_id", "ttype")
+  //   .then((result) => {
+  //     res.send(result);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 };
 
-// get all projects by template
+// get all projects for admin
+const getAllProjectsForAdmin = (req, res) => {
+  Project.find({})
+  .then((result) => {
+    res.send(result);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
 
+// edit project access
+const editProjectAccess = async (req, res) => {
+  const { projectId, userId } = req.body;
+  try {
+    if(!projectId || !ObjectId.isValid(projectId)) {
+      return res.status(200).json({ message: "No timeline Exists" });
+    }
+    let existedProject = await Project.findById(projectId);
+    if(!existedProject) {
+      res.status(404).json({message: "Project does not exists"});
+    }
+    if(!existedProject.access_to.includes(userId)) {
+      existedProject.access_to.push(userId);
+      await existedProject.save();
+      res.status(200).json({message: "Access granted to user"});
+    } else {
+      res.status(200).json({message: "User has already access to the project"});
+    }
+  } catch (error) {
+      console.error('Error updating project access:', error.message);
+  }
+}
+
+// get all projects by template
 const getAllProjectByResource = (req, res) => {
-  Project.find({ resource_name: req.query.resource_name })
+  // Project.find({ access_to: req.query.resource_name })
+  Project.find({ access_to: req.query.id })
     // .populate("temp_id", "ttype")
     .then((result) => {
       res.send(result);
@@ -92,7 +146,6 @@ const getAllProjectByResource = (req, res) => {
 };
 
 // get all projects by specific user
-
 const getAllProjectByUSer = (req, res) => {
   Project.find()
     .populate("resource_name", "username")
@@ -394,6 +447,7 @@ const DescProjects = (req, res) => {
 export {
   addProject,
   getAllProject,
+  getAllProjectsForAdmin,
   getAllProjectByResource,
   getAllProjectByUSer,
   getAllProjectByStatusVC,
@@ -412,5 +466,6 @@ export {
   ProjectSortByN,
   updateProjecByTags,
   updateProjecByTerms,
-  updateProjectByTemp
+  updateProjectByTemp,
+  editProjectAccess
 };

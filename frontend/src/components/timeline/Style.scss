@@ -15,8 +15,12 @@
     justify-content: center;
     column-gap: 30px;
     max-width: 1060px;
-    height: 65vh;
+    height: 58vh;
     margin: auto;
+
+    @media (min-height:800px) {
+      height: 65vh;
+    }
 
     &--left {
       flex: 0 0 70%;

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import jwt from 'jwt-decode'
+import { useState, useEffect } from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from "@mui/material";
 
-import { getRole, getNotifications, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects } from "../../redux/dashboardActions";
+import { getRole, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects, getAllProjects } from "../../redux/dashboardActions";
 
 import SearchIcon from "../../../../assets/images/search.svg";
 import SelectIcon from "../../../../assets/images/select.svg";
@@ -14,10 +13,10 @@ const EstimatesHistory = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
 
-  const userToken = localStorage.getItem("access-token")
-  const { projects, notifications, role, loading } = useSelector(state => state.dashboard)
+  const { projects, role, loading } = useSelector(state => state.dashboard)
+  const { userInfo } = useSelector(state => state.auth)
 
-  const { username, FullName } = jwt(userToken);
+  const { username, FullName, id } = userInfo;
 
   const dispatch = useDispatch()
 
@@ -57,10 +56,14 @@ const EstimatesHistory = () => {
 
     const fetchData = () => {
       if (role === 'manager') {
-        dispatch(getProjectsByManager(FullName))
+        dispatch(getProjectsByManager({ FullName, id }));
       }
       else if (role === 'resource') {
-        dispatch(getProjectsByResource(username))
+        const userData = { FullName, id };
+        dispatch(getProjectsByResource(userData));
+      }
+      else if (role === "admin") {
+        dispatch(getAllProjects(role));
       }
       else {
         console.log("No Projects Found");
@@ -68,18 +71,18 @@ const EstimatesHistory = () => {
     }
 
     fetchData()
-  }, [role, username, FullName, dispatch]);
+  }, [role, username, FullName, dispatch, id]);
 
 
   useEffect(() => {
     dispatch(getRole(username))
-    dispatch(getNotifications(username))
+    // dispatch(getNotifications(username))
   }, [])
 
   return (
     <>
       <div className="nb-estimatesHistory-wrapper">
-        {/* Header */} 
+        {/* Header */}
         <div className="nb-estimatesHistory-header">
           <div className="main-title">
             <h5>ESTIMATES</h5>
@@ -113,13 +116,12 @@ const EstimatesHistory = () => {
             </div>
           </div>
         </div>
-
         {loading ? (
           <div className="circular-progress">
             <CircularProgress />
           </div>
         ) : (
-          searchResults.map((project, index) => (
+          searchResults?.map((project) => (
             <div className="nb-estimatesHistory-content" key={project._id}>
               <div className="calender-wrapper">
                 <div className="date-box">

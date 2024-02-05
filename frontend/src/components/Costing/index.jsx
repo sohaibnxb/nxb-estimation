@@ -1,8 +1,5 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from 'axios';
-import { toast } from 'react-toastify';
 import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
 import ProgressBar from "../common/ProgressBar";
@@ -10,25 +7,23 @@ import {
   FormControl,
   TextField,
   Button,
-  Grid,
   Card,
 } from "@mui/material";
+import { toast } from 'react-toastify';
 import { useFormik } from "formik";
 
-import "./Style.scss";
 
-const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+import "./Style.scss";
+import API from "../../utils/api";
+
+const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
 const Costing = () => {
 
-  const [projectHourRate, setProjectHourRate] = useState(0)
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const { project } = useSelector(state => state.timeline)
-  const { timelines } = useSelector(state => state.timeline)
+  const { timelines, } = useSelector(state => state.timeline);
 
-  
-  const timelinesDataForCosting = timelines.map(timeline => ({
+  const timelinesDataForCosting = timelines?.map(timeline => ({
     timelineId: timeline?._id,
     projectId: timeline?.projectId,
     timelineTitle: timeline?.timelineTitle,
@@ -41,18 +36,21 @@ const Costing = () => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      // data: timelinesDataForCosting
       data: timelinesDataForCosting
     },
     onSubmit: async (values) => {
-
-      try {
-        const costs = await axios.post(`${backendURL}/api/costing/`, { costings: values.data })
-        if (costs) {
-          navigate("/languages");
+      const { status, message } = checkHourlyRate(values.data);
+      if(status) {
+        try {
+          const costs = await API.post(`${backendURL}/api/costing/`, { costings: values.data })
+          if (costs) {
+            navigate("/languages");
+          }
+        } catch (error) {
+          console.log("error", error);
         }
-      } catch (error) {
-        console.log("error", error);
+      } else {
+        toast.error(message);
       }
     },
     validate: async (values) => {
@@ -63,6 +61,16 @@ const Costing = () => {
       return errors;
     },
   });
+
+  const checkHourlyRate = (arr) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].hourRate === null) {
+        return { status: false, message: 'Please add hourly rate'};
+      }
+    }
+    return { status: true, message: ''};
+  }
+
   const handleChange = (e, index) => {
     const { value } = e.target;
 
@@ -72,21 +80,6 @@ const Costing = () => {
     formik.setValues({ ...formik.values, data: updatedData });
   }
 
-  // Load the cost of project if project exists
-  useLayoutEffect(() => {
-
-    // async function fetchProjectCosting() {
-    //   const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${project?.proj_name}`);
-    //   if (projectCost) {
-    //     console.log('first', projectCost);
-    //     const hourRate = parseInt(projectCost.data[0]?.hourRate)
-    //     setProjectHourRate(hourRate)
-    //   }
-    //   // projectCost()
-    // }
-    // fetchProjectCosting()
-  }
-    , [])
 
   let totalCost = formik.values.data.reduce((total, item) => (total + (item.hourRate * item.totalHours)), 0)
   return (
@@ -110,7 +103,7 @@ const Costing = () => {
 
             {
               timelinesDataForCosting?.map((timeline, index) => (
-                <tr>
+                <tr key={index}>
                   <td>{timeline?.timelineTitle}</td>
                   <td>
                     <FormControl>
@@ -127,7 +120,6 @@ const Costing = () => {
                     / hours
                   </td>
                   <td>{timeline?.totalHours}</td>
-                  {/* <td>{(timeline?.totalHours * formik.values.data[index].hourRate)}</td> */}
                   <td>{formik.values.data[index].totalCost}</td>
                 </tr>
               ))
@@ -140,7 +132,7 @@ const Costing = () => {
             </tr>
           </table>
         </Card>
-        <div container className="estimate-btns-container">
+        <div className="estimate-btns-container">
           <Button
             variant="contained"
             className="secondary-btn estimate-nav-btn"

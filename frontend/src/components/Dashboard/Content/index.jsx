@@ -1,7 +1,5 @@
-import React from 'react'
 import EstimatesHistory from './EstimatesHistory'
 import Statuses from './Statuses'
-//styles
 import "./Style.scss"
 
 const Content = () => {

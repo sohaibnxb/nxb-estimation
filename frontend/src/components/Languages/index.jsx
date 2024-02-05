@@ -1,59 +1,23 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import Select, { components } from "react-select";
+import { components } from "react-select";
 import CreatableSelect from 'react-select/creatable';
 import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
-import { Button, Card, Tabs, Tab, Typography, Box } from "@mui/material";
-import Pdf from "../../assets/images/google-drive-pdf-file.png";
+import { Button, Card, Tabs, Tab, Box } from "@mui/material";
 import Search from "../../assets/images/search.svg";
 import ProgressBar from "../common/ProgressBar";
-import axios from "axios";
 
 import SaveIcon from '@mui/icons-material/Save';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ReactPDF, { PDFDownloadLink, PDFViewer, BlobProvider } from '@react-pdf/renderer';
+import { BlobProvider } from '@react-pdf/renderer';
 import VteamsTemplate from "../pdf/VteamsTemplate";
 import "./style.scss";
 import { useSelector } from "react-redux";
+import NextbridgeTemplate from "../pdf/NextbridgeTemplate";
+import API from "../../utils/api";
 
-const DropdownIndicator = (props) => {
-  return (
-    <components.DropdownIndicator {...props}>
-      <img src={Search} alt="search" />
-    </components.DropdownIndicator>
-  )
-}
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-
-const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
-
+const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
 const Languages = () => {
   const [selectedOption, setSelectedOption] = useState([]);
@@ -64,7 +28,6 @@ const Languages = () => {
   const [vteam, setVteam] = useState('6395ded86d71e15926fbbdc1');
   const [nxb, setNxb] = useState('6395df75a9038f587df95185');
   const [generatePdf, setGeneratePdf] = useState(false)
-  // const [project, setProject] = useState(null)
   const [isReady, setIsReady] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const previewDropDownRef = useRef(null)
@@ -106,36 +69,27 @@ const Languages = () => {
     setIsDropDownOpen(!isDropDownOpen);
   };
 
-
-
   async function addTagsAndTerms() {
     let getValue = selectedOption.map(function (s) {
       return s["value"];
     });
-    // var projName = localStorage.getItem("projName");
-    // console.log(projName);
-    console.log("getValue", getValue);
-    //  await data(getValue, projName);
 
     // Set languages
-    await axios
+    await API
       .put(`${backendURL}/api/projects/tags`, {
         proj_name: project?.proj_name,
         proj_tags: getValue,
       })
       .then((response) => {
         console.log(response.data);
-        // setProject(response.data)
         setGeneratePdf(true)
       })
       .catch((error) => {
         console.log(error);
-        console.log("error form terms");
       });
-    console.log(notes, 'notes');
 
     // Set Notes
-    await axios
+    await API
       .put(`${backendURL}/api/projects/terms`, {
         proj_name: project?.proj_name,
         notes: notes,
@@ -154,7 +108,7 @@ const Languages = () => {
     await addTagsAndTerms();
     // vteams template
     try {
-      const response = await axios
+      const response = await API
         .put(`${backendURL}/api/projects/temp`, {
           proj_name: project?.proj_name,
           temp_id: vteam,
@@ -178,14 +132,14 @@ const Languages = () => {
     await addTagsAndTerms();
     // var projName = localStorage.getItem("projName");
     // vteams template
-    axios
+    API
       .put(`${backendURL}/api/projects/temp`, {
         proj_name: project?.proj_name,
         temp_id: nxb,
       })
       .then((response) => {
         console.log(response.data);
-        navigate("/dashboard");
+        navigate("/");
       })
       .catch((error) => {
         console.log(error);
@@ -205,8 +159,6 @@ const Languages = () => {
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-
-
   }, [])
 
   // Load the project languages and notes
@@ -215,7 +167,6 @@ const Languages = () => {
     setSelectedOption(formatedOptions)
     setNotes(project?.notes)
     setQuestions(project?.questions)
-    debugger
   }, [])
 
   return (
@@ -297,7 +248,6 @@ const Languages = () => {
             className=" dark-button estimate-nav-btn"
             onClick={AddVteamTemp}
           >
-            {/* {!generatePdf && 'Generate Pdf'} */}
             <SaveIcon sx={{ marginRight: 1 }} />
             Save Estimate
           </Button>
@@ -327,7 +277,7 @@ const Languages = () => {
                 </BlobProvider>
               </li>
               <li className="preview-dropdown-item" onClick={toggleDropdown}>
-                <BlobProvider document={generatePdf && <VteamsTemplate projId={project?._id} projName={project?.proj_name} />}>
+                <BlobProvider document={generatePdf && <NextbridgeTemplate projId={project?._id} projName={project?.proj_name} />}>
                   {({ url, loading }) => (
                     <a href={url} target="_blank" rel="noreferrer">
                       {loading ? 'Generatiing Preview...' : 'Nextbridge'}
@@ -347,8 +297,39 @@ const Languages = () => {
   );
 };
 
-
-
-// Estimate is prepared based on our understanding of tasks as listed above.  Any modification or addition in above task list will affect time and cost as per scope. Logo, Images, video and other content will be provided by client. We will use Bootstrap as our HTML/CSS stan dards. Markup will be compatible to all modern browsers, for internet explorer, version 12 and above will be supportive only
-
 export default Languages
+
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+const DropdownIndicator = (props) => {
+  return (
+    <components.DropdownIndicator {...props}>
+      <img src={Search} alt="search" />
+    </components.DropdownIndicator>
+  )
+}
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}

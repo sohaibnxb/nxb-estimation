@@ -1,150 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { Button, Card, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import SelectIcon from "../../../assets/images/select.svg";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { useSelector, useDispatch } from 'react-redux'
-import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
+import { Button, Card, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-import TableRows from "./TableRows";
 import TimelineTable from "./TimlineTable";
 
 import { getProjectDetails, submitTimelines } from "../redux/timelineActions";
 
-import addIcon from "../../../assets/images/add.svg"
 import { addTimeline, deleteTimeline } from "../redux/timelineSllice";
+import InviteUserModal from "../../common/InviteUserModal";
+import API from "../../../utils/api";
 
-const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
-
+const backendURL = 'http://10.28.81.105:5000' || "http://localhost:5000";
 
 const Timelinecontent = () => {
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
-  const [timelineTables, setTimelineTables] = useState([])
-
-
+  const [timelineTables, setTimelineTables] = useState([]);
+  const [inviteModal, setInviteModal] = useState(false);
+  const toggleInviteModal = (timelineId) => {
+    setBackendId(timelineId);
+    setInviteModal(prevState => !prevState)
+  };
 
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { timelines, loading } = useSelector(state => state.timeline)
-  const { role } = useSelector(state => state.dashboard)
+  const { timelines, loading, project, projectOwner } = useSelector(state => state.timeline);
+  const { role } = useSelector(state => state.dashboard);
 
+  const { userInfo } = useSelector(state => state.auth)
+  const { id: userID, FullName } = userInfo
   const navigate = useNavigate();
-
-  // screens added with estimates in screen schema
-  // async function addScreenNotify() {
-  //   console.log(rowsData, 'addScreenNotifyfunction');
-  //   if (rowsData) {
-
-  //     const projectEstimation = await axios.get(`${backendURL}/api/screens/screen?project_id=${id}`)
-  //       .then((response) => {
-  //         console.log(response.data);
-  //         return response.data
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //     console.log("projectEstimation", projectEstimation);
-
-  //     if (projectEstimation === '') {
-  //       await toast.promise(axios.post(`${backendURL}/api/screens/${id}`, { rowsData }), {
-  //         pending: 'Creating new screen',
-  //         success: 'New Screen created successfully',
-  //         error: 'Error in creating new screen'
-  //       })
-  //         .then((response) => {
-  //           console.log(response.data);
-  //         })
-  //         .catch((error) => {
-  //           console.log(error);
-  //         });
-  //     }
-  //     else {
-  //       await toast.promise(axios.put(`${backendURL}/api/screens/${id}`, {
-  //         project_id: id,
-  //         screens: rowsData,
-  //       }), {
-  //         pending: 'Updating new screen',
-  //         success: 'Update screen estimation successfully',
-  //         error: 'Error in updating new screen'
-  //       })
-  //         .then((response) => {
-  //           console.log(response.data);
-  //         })
-  //         .catch((error) => {
-  //           console.log(error);
-  //         });
-  //     }
-  //     // Notification send it to manager
-  //     // var key = localStorage.getItem("username");
-  //     // var projKey = localStorage.getItem("projName");
-  //     // var managerKey = localStorage.getItem("managerName");
-  //     await toast.promise(axios.post(
-  //       `${backendURL}/api/notifications/?senderName=${username}&receiptName=${managerName}&projectName=${project?.proj_name}&read=false&count=1`
-  //     ), {
-  //       pending: 'Sending notification',
-  //       success: 'Notification sent successfully to your manager',
-  //       error: 'Error in sending notifications'
-  //     })
-  //       .then((res) => {
-  //         console.log(res.data);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //     //receiptant read notification
-  //     // const projN = localStorage.getItem("projName");
-  //     await axios
-  //       .put(`${backendURL}/api/notifications/?projectName=${project?.proj_name}`, {
-  //         read: true,
-  //       })
-  //       .then((res) => {
-  //         console.log(res.data);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //     // project status change
-  //     await axios
-  //       .put(`${backendURL}/api/projects/?_id=${id}`, {
-  //         proj_status: "Ready for Review",
-  //       })
-  //       .then((res) => {
-  //         console.log(res.data);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //       });
-  //   }
-  // }
-
-  // screens added with estimates in screen schema and project status changed as draft
-  // function savedAsDraft() {
-
-  //   // if (rowsData != "") {
-  //   //   axios
-  //   //     .post(`${backendURL}/api/screens/${id}`, { rowsData })
-  //   //     .then((response) => {
-  //   //       console.log(response.data);
-  //   //       alert("New Screen created successfully");
-
-  //   //     })
-  //   //     .catch((error) => {
-  //   //       console.log(error);
-  //   //     });
-  //   // }
-  //   // // project status change
-  //   // axios
-  //   //   .put(`${backendURL}/api/projects/?_id=${id}`, {
-  //   //     proj_status: "Draft",
-  //   //   })
-  //   //   .then((res) => {
-  //   //     console.log(res.data);
-  //   //   })
-  //   //   .catch((error) => {
-  //   //     console.log(error);
-  //   //   });
-  // }
 
   // select option
   estimatedMode.map((estimateOption) => estimateOption);
@@ -158,10 +44,12 @@ const Timelinecontent = () => {
     }
   };
 
-
+  // useEffect(() => {
+  //   const projectId = project._id;
+  //   getTimelines(projectId);
+  // }, [timelines]);
 
   // function navigatePage() {
-  //   console.log('navigate hours', totalHours)
   //   if (rowsData !== "") {
   //     return navigate("/costing", { state: totalHours });
 
@@ -171,33 +59,65 @@ const Timelinecontent = () => {
   // }
 
   function navigatePageD() {
-    return navigate("/dashboard");
+    let { status, message } = validateTimelines(timelines);
+    if (status) {
+      dispatch(submitTimelines(timelines)).then((res) => console.log(res));
+      return navigate("/");
+    } else {
+      toast.error(message);
+    }
   }
-
-
 
   // Submit Timelines
   async function handleTimelinesSubmit() {
-    // const submittedTimelines = await axios.post(`${backendURL}/api/timelines/`, {
-    //   timelines: timelines
-    // })
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     navigate("/costing",);
-    //     return response.data
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    dispatch(submitTimelines(timelines)).then((res) => navigate('/costing'))
+    let { status, message } = validateTimelines(timelines);
+    if (status) {
+      console.log("TIMELINES: ", timelines);
+      dispatch(submitTimelines(timelines)).then((res) => navigate('/costing'));
+    } else {
+      toast.error(message);
+    }
   }
 
+  // to validate timeline form
+  const validateTimelines = (timelineData) => {
+    console.log(timelineData);
+    for (const timeline of timelineData) {
+        if (!timeline.timelineTitle) {
+            return { status: false, message: 'Please add timeline title' };
+        }
+
+        // Check items array
+        if (timeline.items.length) {
+            for (const item of timeline.items) {
+                if (!item.itemName) {
+                    return { status: false, message: 'Please add timeline item name' };
+                }
+                if (!item.hours) {
+                    return { status: false, message: 'Please add estimation hours' };
+                }
+
+                // Check subItems array
+                if (item.subItems && item.subItems.length > 0) {
+                    for (const subItem of item.subItems) {
+                        if (!subItem.trim()) {
+                            return { status: false, message: 'Please add valid subItem name' };
+                        }
+                    }
+                }
+            }
+        } else {
+            return { status: false, message: 'Please add items in the timeline' };
+        }
+    }
+    return { status: true, message: '' };
+  };
 
   // Api
   useEffect(() => {
-    dispatch(getProjectDetails(id))
-    setTimelineTables([<TimelineTable />])
-
+    let idsData = { id, userID, FullName, role };
+    dispatch(getProjectDetails(idsData));
+    setTimelineTables([<TimelineTable />]);
   }, [id]);
 
   useEffect(() => {
@@ -220,7 +140,6 @@ const Timelinecontent = () => {
   const [backendId, setBackendId] = useState(null);
 
   const handleDeleteClick = (frontendId, backendId, event) => {
-
     setSelectedId(frontendId);
     setBackendId(backendId)
     setDialogOpen(true);
@@ -231,12 +150,9 @@ const Timelinecontent = () => {
   };
 
   const handleDeleteConfirmed = () => {
-    // const updatedData = data.filter(item => item.id !== selectedId);
-    // setData(updatedData);
     dispatch(deleteTimeline(selectedId));
     setDialogOpen(false);
   };
-
 
   return (
     <>
@@ -273,81 +189,87 @@ const Timelinecontent = () => {
                     {timelines?.map((timeline) => (
                       <li className="active" key={timeline.id}>
                         {timeline.timelineTitle || 'Timeline Title'}
-                        <div div className="action-btns" >
-                          {/* <button>
-                            <i className="fas fa-edit"></i>
-                          </button> */}
-                          <button
-                            onClick={(event) => handleDeleteClick(timeline.id, timeline._id, event)}
-                          >
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </div>
+                        {
+                          role !== "resource" &&
+                          <div className="action-btns" >
+                            <button onClick={() => toggleInviteModal(timeline._id)}>
+                              <i className="fa fa-solid fa-user-plus"></i>
+                            </button>
+                            <button
+                              onClick={(event) => handleDeleteClick(timeline.id, timeline._id, event)}
+                            >
+                              <i className="fas fa-times"></i>
+                            </button>
+                          </div>
+                        }
                       </li>
                     ))}
 
                   </ul>
-                  <div className="add-button"
-                    // onClick={() => setTimelineTables(prev => {+++
-                    //   return [...prev, <TimelineTable />]
-                    // })}
-                    onClick={handleAddTimeline}
-                  >
-                    <svg
-                      id="Component_21_4"
-                      data-name="Component 21 – 4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="60"
-                      height="60"
-                      viewBox="0 0 60 60"
+                  {
+                    projectOwner === FullName &&
+                    <div className="add-button"
+                      // onClick={() => setTimelineTables(prev => {+++
+                      //   return [...prev, <TimelineTable />]
+                      // })}
+                      onClick={handleAddTimeline}
                     >
-                      <path
-                        id="Rectangle_305"
-                        data-name="Rectangle 305"
-                        d="M0,0H60a0,0,0,0,1,0,0V60a0,0,0,0,1,0,0H8a8,8,0,0,1-8-8V0A0,0,0,0,1,0,0Z"
-                        fill="currentColor"
-                      />
-                      <path
-                        id="Path_23"
-                        data-name="Path 23"
-                        d="M0,0H60V60Z"
-                        fill="#fff"
-                      />
-                      <g
-                        id="Group_322"
-                        data-name="Group 322"
-                        transform="translate(-1751.5 -684.5)"
+                      <svg
+                        id="Component_21_4"
+                        data-name="Component 21 – 4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="60"
+                        height="60"
+                        viewBox="0 0 60 60"
                       >
-                        <line
-                          id="Line_161"
-                          data-name="Line 161"
-                          x2="16"
-                          transform="translate(1761.5 726.5)"
-                          fill="none"
-                          stroke="#fff"
-                          strokeWidth="2.5"
+                        <path
+                          id="Rectangle_305"
+                          data-name="Rectangle 305"
+                          d="M0,0H60a0,0,0,0,1,0,0V60a0,0,0,0,1,0,0H8a8,8,0,0,1-8-8V0A0,0,0,0,1,0,0Z"
+                          fill="currentColor"
                         />
-                        <line
-                          id="Line_162"
-                          data-name="Line 162"
-                          y2="16"
-                          transform="translate(1769.5 718.5)"
-                          fill="none"
-                          stroke="#fff"
-                          strokeWidth="2.5"
+                        <path
+                          id="Path_23"
+                          data-name="Path 23"
+                          d="M0,0H60V60Z"
+                          fill="#fff"
                         />
-                      </g>
-                    </svg>
-                  </div>
+                        <g
+                          id="Group_322"
+                          data-name="Group 322"
+                          transform="translate(-1751.5 -684.5)"
+                        >
+                          <line
+                            id="Line_161"
+                            data-name="Line 161"
+                            x2="16"
+                            transform="translate(1761.5 726.5)"
+                            fill="none"
+                            stroke="#fff"
+                            strokeWidth="2.5"
+                          />
+                          <line
+                            id="Line_162"
+                            data-name="Line 162"
+                            y2="16"
+                            transform="translate(1769.5 718.5)"
+                            fill="none"
+                            stroke="#fff"
+                            strokeWidth="2.5"
+                          />
+                        </g>
+                      </svg>
+                    </div>
+                  }
                 </CardContent>
               </Card>
             </div>
           </div>
-          <div container className="estimate-btns-container">
+          <div className="estimate-btns-container">
             <Button
               variant="contained"
               className="secondary-btn estimate-nav-btn"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/")}
             >
               Back
             </Button>
@@ -359,7 +281,7 @@ const Timelinecontent = () => {
             >
               Save As Draft
             </Button>
-            {role === "manager" ? (
+            {role === "manager" || role === "admin" ? (
               <Button
                 type="sumit"
                 onClick={() => {
@@ -395,19 +317,20 @@ const Timelinecontent = () => {
         onDelete={handleDeleteConfirmed}
         id={backendId}
       />
+
+      <InviteUserModal open={inviteModal} toggleOpen={toggleInviteModal} timelineId={backendId} />
     </>
   );
 };
 
 export default Timelinecontent;
 
-
-
+// eslint-disable-next-line react/prop-types
 const ConfirmationDialog = ({ open, onClose, onDelete, id }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${backendURL}/api/timelines/${id}`);
+      await API.delete(`${backendURL}/api/timelines/${id}`);
       onDelete();
       onClose();
     } catch (error) {

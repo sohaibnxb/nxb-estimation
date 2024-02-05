@@ -2,6 +2,7 @@
 @import "../../../assets/scss/mixin.scss";
 .nb-section {
   padding: calculateRem(60px);
+  padding-top: 2rem;
   .nb-dashboard-title {
     h4 {
       font-family: map-get($font-family, "medium");
@@ -271,7 +272,7 @@
                     width: calculateRem(9px);
                     position: absolute;
                     top: 23.5%;
-                    left: 29px;
+                    left: 17px;
                     background: map-get($base_colors, "blue-text-color");
                   }
                 }
@@ -290,7 +291,7 @@
                     width: calculateRem(9px);
                     position: absolute;
                     top: 23.5%;
-                    left: 11px;
+                    left: -2px;
                     background: map-get($base_colors, "tertiary-color");
                   }
                 }
@@ -309,7 +310,7 @@
                     width: calculateRem(9px);
                     position: absolute;
                     top: 23.5%;
-                    left: 21px;
+                    left: 13px;
                     background: map-get($base_colors, "primary-color");
                   }
                 }

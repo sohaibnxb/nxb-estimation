@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import moment from "moment";
 import nextwerkImg from "./images/NEXTWORK.png"
@@ -10,62 +9,28 @@ import OpenSansRegular from './fonts/OpenSans-Regular.ttf';
 import OpenSansMedium from './fonts/OpenSans-Medium.ttf';
 import OpenSansBold from './fonts/OpenSans-Bold.ttf';
 import OpenSansBoldItalic from './fonts/OpenSans-BoldItalic.ttf';
+import API from '../../utils/api';
 
-const backendURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
 
-const ReactPdf = ({ projId, projName }) => {
+// eslint-disable-next-line react/prop-types
+const VteamsTemplate = ({ projId, }) => {
 
     const [project, setProject] = useState(null)
-    const [languages, setLanguages] = useState(null)
-    // const [projectCost, setProjectCost] = useState(null)
-    const [projectScreens, setProjectScreens] = useState(null)
-
-    const sum = projectScreens?.screens?.reduce((accumulator, screen) => {
-        return accumulator + parseInt(screen.hours);
-    }, 0)
 
     const projectCost = project?.timelines?.reduce((total, item) => (total + item.costing[0].totalCost), 0)
-    // const notes = project?.notes.split(/(?<=\.)\n|(?<=\.) /);
-
-    // const notes = project?.notes.split(/[.\n]+/);
-    // const questions = project?.questions.split(/[.\n]+/);
     const notes = project?.notes.split('\n');
     const questions = project?.questions.split('\n');
-    const fetchProject = async (project) => {
-        // const projId = localStorage.getItem("projId")
+    const fetchProject = async () => {
         console.log("projId", projId);
         try {
-            const response = await axios.get(`${backendURL}/api/projects/${projId}`)
-            console.log("proj response", response.data);
+            const response = await API.get(`${backendURL}/api/projects/${projId}`)
             setProject(response.data)
         } catch (error) {
             console.log(error);
         }
     }
-
-    // const fetchCosting = async () => {
-    //     // const projName = localStorage.getItem("projName")
-
-    //     try {
-    //         const projectCost = await axios.get(`${backendURL}/api/costing/project?projectName=${projName}`)
-    //         console.log(projectCost.data)
-    //         setProjectCost(projectCost.data[0])
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-    // const fetchScreens = async () => {
-    //     // const projId = localStorage.getItem("projId")
-    //     try {
-    //         const projectScreens = await axios.get(`${backendURL}/api/screens/screen?project_id=${projId}`)
-    //         console.log("project screens", projectScreens.data)
-    //         setProjectScreens(projectScreens.data)
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-
-    // }
 
     useEffect(() => {
         fetchProject()
@@ -358,6 +323,8 @@ const ReactPdf = ({ projId, projName }) => {
 
     });
 
+    if (!project) return null;
+
     return (
         <Document>
             {/* Main Page */}
@@ -424,7 +391,7 @@ const ReactPdf = ({ projId, projName }) => {
                         {/* Timeline Table */}
                         {
                             project?.timelines?.map((timeline) => (
-                                <View key={timeline?._id} style={{marginBottom:"20px"}}>
+                                <View key={timeline?._id} style={{ marginBottom: "20px" }}>
                                     <View style={styles.timelinePage.timelineTable}>
                                         <View style={styles.timelinePage.timelineTable.head}>
                                             <View style={[styles.timelinePage.timelineTable.td, { width: '80%' }]}><Text>{timeline?.timelineTitle}</Text></View>
@@ -618,4 +585,4 @@ const ReactPdf = ({ projId, projName }) => {
     );
 };
 
-export default ReactPdf;
+export default VteamsTemplate;

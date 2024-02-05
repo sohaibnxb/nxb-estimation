@@ -2,6 +2,7 @@ import express from "express";
 import {
   addProject,
   getAllProject,
+  getAllProjectsForAdmin,
   getAllProjectByUSer,
   getAllProjectByStatusVC,
   getAllProjectByStatusVP,
@@ -20,7 +21,8 @@ import {
   getAllProjectByResource,
   updateProjecByTags,
   updateProjecByTerms,
-  updateProjectByTemp
+  updateProjectByTemp,
+  editProjectAccess
 } from "../controllers/projectController.js";
 import {
   verifyToken,
@@ -32,6 +34,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllProject);
+router.get("/admin", getAllProjectsForAdmin);
 router.get("/resource", getAllProjectByResource);
 router.get("/comp", getAllProjectByStatusVC);
 router.get("/pending", getAllProjectByStatusVP);
@@ -42,6 +45,8 @@ router.get("/Ndraft", getAllProjectByStatusND);
 
 router.get("/Vsort", ProjectSortByV);
 router.get("/Nsort", ProjectSortByN);
+
+router.patch("/update-access", editProjectAccess);
 
 router.get("/userId", getAllProjectByUSer);
 router.get("/search", searchProjectsByTags);

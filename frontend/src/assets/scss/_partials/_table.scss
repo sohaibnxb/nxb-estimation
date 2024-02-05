@@ -145,7 +145,7 @@ table {
               position: absolute;
               top: calculateRem(8px);
               right: 34px;
-              content: url(../../images/close.svg);
+              // content: url(../../images/close.svg);
               height: calculateRem(17px);
               width: calculateRem(17px);
               background: map-get($base_colors, "input-border-color");

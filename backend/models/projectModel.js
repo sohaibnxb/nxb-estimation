@@ -19,6 +19,10 @@ const projectSchema = new Schema({
     type: String,
     required: true,
   },
+  access_to: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "User"
+  },
   created_date: {
     type: Date,
     required: true,
