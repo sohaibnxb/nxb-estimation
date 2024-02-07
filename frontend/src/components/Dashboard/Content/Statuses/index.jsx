@@ -21,8 +21,8 @@ const Statuses = () => {
   const [vTeamsProjectsCount, setVTeamsProjectsCount] = useState(0);
 
   useEffect(() => {
-    const vTeamsProjects = projects.filter(project => project.proposal_for === "v-teams").length;
-    const nxbProjects = projects.filter(project => project.proposal_for === "nxb").length;
+    const vTeamsProjects = projects.filter(project => project.team === "v-teams").length;
+    const nxbProjects = projects.filter(project => project.team === "nxb").length;
     setNxbProjectsCount(nxbProjects);
     setVTeamsProjectsCount(vTeamsProjects);
   }, [projects]);

@@ -33,7 +33,7 @@ const TimelineSchema = new Schema({
     },
     totalHours: {
         type: Number,
-        required: true,
+        // required: true,
     },
     access_to: {
         type: [mongoose.Types.ObjectId],

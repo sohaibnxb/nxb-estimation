@@ -9,6 +9,7 @@ const addProject = (req, res) => {
     proj_type,
     prepared_by,
     proposal_for,
+    team,
     created_date,
     version,
     proj_description,
@@ -24,6 +25,7 @@ const addProject = (req, res) => {
     !proj_type ||
     !prepared_by ||
     !proposal_for ||
+    !team ||
     !created_date ||
     !proj_description ||
     !version
@@ -49,6 +51,7 @@ const addProject = (req, res) => {
         proj_type: proj_type,
         prepared_by: prepared_by,
         proposal_for: proposal_for,
+        team: team,
         created_date: created_date,
         proj_description: proj_description,
         proj_tags: proj_tags,
@@ -114,7 +117,7 @@ const editProjectAccess = async (req, res) => {
   const { projectId, userId } = req.body;
   try {
     if(!projectId || !ObjectId.isValid(projectId)) {
-      return res.status(200).json({ message: "No timeline Exists" });
+      return res.status(404).json({ message: "No timeline Exists" });
     }
     let existedProject = await Project.findById(projectId);
     if(!existedProject) {
@@ -125,7 +128,7 @@ const editProjectAccess = async (req, res) => {
       await existedProject.save();
       res.status(200).json({message: "Access granted to user"});
     } else {
-      res.status(200).json({message: "User has already access to the project"});
+      res.status(208).json({message: "User has already access to the project"});
     }
   } catch (error) {
       console.error('Error updating project access:', error.message);

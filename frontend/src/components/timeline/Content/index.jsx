@@ -69,11 +69,15 @@ const Timelinecontent = () => {
   }
 
   // Submit Timelines
-  async function handleTimelinesSubmit() {
+  async function handleTimelinesSubmit(isNavigate) {
     let { status, message } = validateTimelines(timelines);
     if (status) {
       console.log("TIMELINES: ", timelines);
-      dispatch(submitTimelines(timelines)).then((res) => navigate('/costing'));
+      dispatch(submitTimelines(timelines)).then((res) => {
+        if(isNavigate) {
+          navigate('/costing');
+        }
+      });
     } else {
       toast.error(message);
     }
@@ -81,33 +85,36 @@ const Timelinecontent = () => {
 
   // to validate timeline form
   const validateTimelines = (timelineData) => {
-    console.log(timelineData);
     for (const timeline of timelineData) {
         if (!timeline.timelineTitle) {
             return { status: false, message: 'Please add timeline title' };
         }
 
-        // Check items array
-        if (timeline.items.length) {
-            for (const item of timeline.items) {
-                if (!item.itemName) {
-                    return { status: false, message: 'Please add timeline item name' };
-                }
-                if (!item.hours) {
-                    return { status: false, message: 'Please add estimation hours' };
-                }
+        if (role === "manager" || role === "admin") {
+            if (!timeline.items || timeline.items.length === 0) {
+                return { status: true, message: '' };
+            }
+        } else if (role === "resource") {
+            if (!timeline.items || timeline.items.length === 0) {
+                return { status: false, message: 'Please add items in the timeline' };
+            }
+        }
 
-                // Check subItems array
-                if (item.subItems && item.subItems.length > 0) {
-                    for (const subItem of item.subItems) {
-                        if (!subItem.trim()) {
-                            return { status: false, message: 'Please add valid subItem name' };
-                        }
+        for (const item of timeline.items) {
+            if (!item.itemName) {
+                return { status: false, message: 'Please add timeline item name' };
+            }
+            if (!item.hours) {
+                return { status: false, message: 'Please add estimation hours' };
+            }
+
+            if (item.subItems && item.subItems.length > 0) {
+                for (const subItem of item.subItems) {
+                    if (!subItem.trim()) {
+                        return { status: false, message: 'Please add valid subItem name' };
                     }
                 }
             }
-        } else {
-            return { status: false, message: 'Please add items in the timeline' };
         }
     }
     return { status: true, message: '' };
@@ -275,11 +282,11 @@ const Timelinecontent = () => {
             </Button>
             <Button
               type="submit"
-              // onClick={savedAsDraft}
+              onClick={() => handleTimelinesSubmit(false)}
               variant="contained"
               className="dark-button estimate-nav-btn"
             >
-              Save As Draft
+              Save
             </Button>
             {role === "manager" || role === "admin" ? (
               <Button
@@ -287,7 +294,7 @@ const Timelinecontent = () => {
                 onClick={() => {
                   // addScreenNotify();
                   // navigatePage();
-                  handleTimelinesSubmit()
+                  handleTimelinesSubmit(true)
                 }}
                 variant="contained"
                 className="secondary-btn estimate-nav-btn"

@@ -18,7 +18,7 @@ export const sendInviteEmail = async (req, res) => {
         theme: 'default',
         product: {
             name: 'NXB Estimation App',
-            link: 'http://localhost:5173/'
+            link: 'http://10.28.81.57:4173',
             // link: 'http://10.28.81.105:3006/'
         }
     });
@@ -32,7 +32,7 @@ export const sendInviteEmail = async (req, res) => {
                 button: {
                     color: '#22BC66', // Optional action button color
                     text: 'Go to NxB Estimation',
-                    link: 'http://localhost:5173/'
+                    link: 'http://10.28.81.57:4173',
                     // link: 'http://10.28.81.105:3006/'
                 }
             }

@@ -19,6 +19,10 @@ const projectSchema = new Schema({
     type: String,
     required: true,
   },
+  team: {
+    type: String,
+    required: true,
+  },
   access_to: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "User"

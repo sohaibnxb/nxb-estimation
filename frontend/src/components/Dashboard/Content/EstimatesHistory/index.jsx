@@ -12,24 +12,35 @@ import SelectIcon from "../../../../assets/images/select.svg";
 const EstimatesHistory = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
-
   const { projects, role, loading } = useSelector(state => state.dashboard)
   const { userInfo } = useSelector(state => state.auth)
-
   const { username, FullName, id } = userInfo;
+  const [userProjects, setUserProjects] = useState([]);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setUserProjects(projects);
+  }, [projects]);
 
   const handleSelected = async (event) => {
     var selectedVal = event.target.value;
+    if (selectedVal === "") {
+      setUserProjects(projects)
+    }
     if (selectedVal === "Vteams") {
-      dispatch(getVteamsProjects())
+      const vteamsProjects = projects.filter(project => project.team === "v-teams")
+      setUserProjects(vteamsProjects)
     }
     else if (selectedVal === "Nextbridge") {
-      dispatch(getNxbProjects())
+      const nxbProjects = projects.filter(project => project.team === "nxb")
+      setUserProjects(nxbProjects)
     }
     else if (selectedVal === "RecentlyAdded") {
-      dispatch(getRecentProjects(FullName))
+      const recentProjects = [...projects].sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      setUserProjects(recentProjects)
     } else {
       console.log("no data");
     }
@@ -42,15 +53,15 @@ const EstimatesHistory = () => {
   // Projects Search
   useEffect(() => {
     if (inputSearch === '') {
-      setSearchResults(projects);
+      setSearchResults(userProjects);
     }
     else {
-      const results = projects.filter((item) =>
+      const results = userProjects.filter((item) =>
         item.proj_name.toLowerCase().includes(inputSearch.toLowerCase())
       );
       setSearchResults(results);
     }
-  }, [inputSearch, projects]);
+  }, [inputSearch, userProjects]);
 
   useEffect(() => {
 
@@ -107,7 +118,7 @@ const EstimatesHistory = () => {
                 onChange={handleSelected}
                 className="sort-autocomplete"
               >
-                <option value="DEFAULT">Sort By:</option>
+                <option value="">Sort By:</option>
                 <option value="Vteams">Vteams</option>
                 <option value="Nextbridge">Nextbridge</option>
                 <option value="RecentlyAdded">Recently Added</option>

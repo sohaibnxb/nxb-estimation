@@ -30,6 +30,7 @@ export default function InviteUserModal({ open, toggleOpen, timelineId }) {
   const [selectedUser, setSelectedUser] = useState('');
   const projectId = useSelector(state => state.timeline?.project?._id);
   const projectName = useSelector(state => state.timeline?.project?.proj_name);
+  const { FullName } = useSelector(state => state.auth?.userInfo);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -63,19 +64,24 @@ export default function InviteUserModal({ open, toggleOpen, timelineId }) {
         timelineId,
         userId
       });
-      if(timelineResponse.status === 200 && projectResponse.status === 200) {
+      if(timelineResponse.status === 200 && (projectResponse.status === 200 || projectResponse.status === 208)) {
         toast.success("Access granted successfully");
         // send invite email to invited user
         const inviteResponse = await API.post(`${backendURL}/api/email`, {
           email: sendEmailTo,
           project: projectName,
-          name: selectedUser
+          name: selectedUser,
+          senderName: FullName
         });
         if(inviteResponse.status === 201) {
           toast.success(`Invite email sent to ${selectedUser}`);
         } else {
           toast.error("Something went wrong while sending email");
         }
+      } else if(timelineResponse.status === 208) {
+        toast.warning("User already have access to this timeline");
+      } else if(timelineResponse.status === 204) {
+        toast.warning("Please save the timeline first");
       } else {
         toast.error("Something went wrong while inviting user");
       }

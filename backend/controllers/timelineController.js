@@ -56,7 +56,7 @@ const editTimelinesAccess = async (req, res) => {
             await existedTimeline.save();
             res.status(200).json({message: "Access granted successfully"});
         } else {
-            res.status(200).json({message: "User already has access to the timeline"});
+            res.status(208).json({message: "User already has access to the timeline"});
         }
     } catch (error) {
         console.error('Error updating timeline access:', error.message);
@@ -67,9 +67,8 @@ const editTimelinesAccess = async (req, res) => {
 const deleteTimeline = async (req, res) => {
     const timelineId = req.params.id
     try {
-
         if (!timelineId || !ObjectId.isValid(timelineId)) {
-            return res.status(200).json({ message: "No timeline Exists" })
+            return res.status(204).json({ message: "No timeline Exists" })
         }
         else {
             const deletedTimeline = await Timeline.findByIdAndDelete(timelineId);

@@ -70,11 +70,6 @@ API.interceptors.response.use(
             localStorage.clear()
         }
         else {
-            toast.error('Something waent wrong. Please try again later.', {
-                autoClose: 3000,
-            });
-            history.navigate('/signin');
-            localStorage.clear()
             throw error; // Propagate the error
         }
     }

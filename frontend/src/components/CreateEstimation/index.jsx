@@ -11,7 +11,6 @@ import { useNavigate } from "react-router";
 import { newEstimate } from "./services";
 import { useSelector } from "react-redux";
 import API from "../../utils/api";
-import { Field } from 'formik';
 
 const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
@@ -28,6 +27,7 @@ const CreateEstimation = () => {
     title: Yup.string().required("Title is required"),
     proposalType: Yup.string().required("Proposal is required"),
     clientName: Yup.string().required("Client name is required"),
+    team: Yup.string().required("Team Type is required"),
     date: Yup.date().required("Date is required"),
     version: Yup.string().required("Version is required"),
     description: Yup.string().required("Description is required"),
@@ -38,6 +38,7 @@ const CreateEstimation = () => {
       title: "",
       proposalType: "",
       clientName: "",
+      team:"",
       date: "",
       version: "",
       description: "",
@@ -47,6 +48,7 @@ const CreateEstimation = () => {
     onSubmit: async (values) => {
       const title = values.title;
       const proposalType = values.proposalType;
+      const team = values.team;
       const clientName = values.clientName;
       const date = values.date;
       const version = values.version;
@@ -59,6 +61,7 @@ const CreateEstimation = () => {
         proposalType,
         preparedby,
         clientName,
+        team,
         date,
         version,
         description,
@@ -118,7 +121,7 @@ const CreateEstimation = () => {
               </FormControl>
               <FormControl>
                 <label>Proposal For</label>
-                {/* <TextField
+                <TextField
                   variant="outlined"
                   name="clientName"
                   onChange={formik.handleChange}
@@ -126,19 +129,25 @@ const CreateEstimation = () => {
                   value={formik.values.clientName}
                   helperText={formik.touched.clientName && formik?.errors?.clientName}
                   error={!!formik?.errors?.clientName}
-                /> */}
+                />
+              </FormControl>
+              <FormControl>
+                <label>Team Type</label>
                 <div className="team-selection">
                   <select
                     id="team"
                     className="team-autocomplete"
-                    name="clientName"
+                    name="team"
+                    value={formik.values.team}
                     onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   >
                     <option value="">Select</option>
                     <option value="v-teams">Vteams</option>
                     <option value="nxb">Nextbridge</option>
                   </select>
                   <img src={SelectIcon} alt="select" />
+                  {(formik.touched.team && formik?.errors.team) && <span className="error-text">{formik?.errors.team}</span>}
                 </div>
               </FormControl>
               <FormGroup className="estimation-form-group">
@@ -180,13 +189,12 @@ const CreateEstimation = () => {
                   onBlur={formik.handleBlur}
                   value={formik.values.description}
                 ></textarea>
-                {(formik.touched.description && formik?.errors.description) && <span className="description-error">{formik?.errors.description}</span>}
+                {(formik.touched.description && formik?.errors.description) && <span className="error-text">{formik?.errors.description}</span>}
               </FormControl>
             </div>
           </div>
           <Box className="estimate-btns-container">
             <Button
-              to="/"
               variant="contained"
               className="secondary-btn estimate-nav-btn"
               onClick={() => navigate(-1)}
@@ -200,13 +208,13 @@ const CreateEstimation = () => {
             >
               Next
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               type="submit"
               className="secondary-btn estimate-nav-btn"
             >
               Send Invite
-            </Button>
+            </Button> */}
           </Box>
         </form>
       </section>
