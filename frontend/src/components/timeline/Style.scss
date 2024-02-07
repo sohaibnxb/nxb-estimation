@@ -4,6 +4,7 @@
 .text-center {
   text-align: center;
 }
+
 .nb-section {
   padding-bottom: 0px;
   // overflow: auto;
@@ -14,26 +15,33 @@
     justify-content: center;
     column-gap: 30px;
     max-width: 1060px;
-    height: 65vh;
+    height: 58vh;
     margin: auto;
+
+    @media (min-height:800px) {
+      height: 65vh;
+    }
+
     &--left {
       flex: 0 0 70%;
       padding: calculateRem(30px);
       overflow: auto;
-      .nb-innertimeline-wrapper {
-        border: 1px solid map-get($base_colors, "input-border-color");
-      }
+
     }
+
     &--right {
       flex: 0 0 30%;
       position: relative;
       overflow: hidden;
+
       .card-padding {
         padding-bottom: 75px;
         box-shadow: none;
+
         .expertise {
           padding-left: 0;
           margin: 0;
+
           li {
             font-family: map-get($font-family, "regular");
             color: map-get($base_colors, "primary-color");
@@ -47,11 +55,13 @@
             position: relative;
             transition: 0.3s all ease-in-out;
             opacity: 0.8;
+
             &.active {
               font-family: map-get($font-family, "medium");
               color: map-get($base_colors, "blue-text-color");
               opacity: 1;
             }
+
             &:hover,
             &:active {
               .action-btns {
@@ -59,6 +69,7 @@
                 opacity: 1;
               }
             }
+
             .action-btns {
               display: flex;
               align-items: center;
@@ -69,7 +80,8 @@
               visibility: hidden;
               opacity: 0;
               transition: 0.3s all ease-in-out;
-              span {
+
+              button {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -80,9 +92,12 @@
                 font-size: 14px;
                 background-color: transparent;
                 color: map-get($base_colors, "span-color");
+                border: 0;
+
                 &:hover {
                   background-color: map-get($base_colors, "input-border-color");
                 }
+
                 &:not(:last-child) {
                   margin-right: 3.5px;
                 }
@@ -90,6 +105,7 @@
             }
           }
         }
+
         .add-button {
           color: map-get($page_bg, "gd1");
 
@@ -103,7 +119,8 @@
         }
       }
     }
-    > div {
+
+    >div {
       background-color: map-get($base_colors, "white");
       box-shadow: 0px 3px 6px map-get($base_colors, "shadow-color");
       border-radius: 8px;

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Topbar from "../common/Topbar";
@@ -9,30 +8,37 @@ import { FormControl, TextField, Button, FormGroup, Box } from "@mui/material";
 import SelectIcon from "../../assets/images/select.svg";
 import "./Style.scss";
 import { useNavigate } from "react-router";
-import { newEstimate, sendNotification } from "./services";
+import { newEstimate } from "./services";
+import { useSelector } from "react-redux";
+import API from "../../utils/api";
+
+const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
 
 const CreateEstimation = () => {
   const navigate = useNavigate();
-  //const URL = process.env.REACT_APP_SERVER_URL;
   const [selectVal, setSelectValues] = useState([]);
   const [options, setOptions] = useState('');
   const [selectedUser, setSelectedUser] = useState("nothing");
-  const [isRead, setIsRead] = useState(false);
-  const [totalcount, setTotalCount] = useState(1);
+
+  const { userInfo } = useSelector(state => state.auth);
+
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
     proposalType: Yup.string().required("Proposal is required"),
     clientName: Yup.string().required("Client name is required"),
+    team: Yup.string().required("Team Type is required"),
     date: Yup.date().required("Date is required"),
     version: Yup.string().required("Version is required"),
     description: Yup.string().required("Description is required"),
   });
+
   const formik = useFormik({
     initialValues: {
       title: "",
       proposalType: "",
       clientName: "",
+      team:"",
       date: "",
       version: "",
       description: "",
@@ -42,11 +48,12 @@ const CreateEstimation = () => {
     onSubmit: async (values) => {
       const title = values.title;
       const proposalType = values.proposalType;
+      const team = values.team;
       const clientName = values.clientName;
       const date = values.date;
       const version = values.version;
       const description = values.description;
-      const projectCreator = localStorage.getItem("user");
+      const projectCreator = userInfo?.FullName;
       const preparedby = projectCreator;
       const proj_status = "In progress";
       const project = await newEstimate(
@@ -54,23 +61,21 @@ const CreateEstimation = () => {
         proposalType,
         preparedby,
         clientName,
+        team,
         date,
         version,
         description,
         proj_status,
         selectedUser,
       );
-      //console.log("Form Data", values);
-      await sendNotification(title, options, isRead, totalcount, navigate);
       navigate(`/timeline/${project.data._id}`)
     },
   });
-  //console.log("Form Values", formik.values);
+
   useEffect(() => {
 
-    var key = localStorage.getItem("username");
-    axios
-      .get(`http://localhost:5000/api/users/resources/?managerName=${key}`)
+    let key = userInfo?.username;
+    API.get(`${backendURL}/api/users/resources/?managerName=${key}`)
       .then((response) => {
         setSelectValues(response.data);
       })
@@ -86,7 +91,7 @@ const CreateEstimation = () => {
     <>
       <Topbar estimate={false} limiteRole={false} />
       <ProgressBar steps={1} />
-      {/* <section className="nb-section"> */}
+      <section className="nb-section">
         <form onSubmit={formik.handleSubmit}>
           <div className="estimate-container">
             <div className="estimate-form-container">
@@ -95,7 +100,6 @@ const CreateEstimation = () => {
                 <TextField
                   variant="outlined"
                   name="title"
-                  // defaultValue="Connectpoint Connect App"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.title}
@@ -107,7 +111,6 @@ const CreateEstimation = () => {
                 <label>Proposal Type</label>
                 <TextField
                   variant="outlined"
-                  // defaultValue="Ui/Ux"
                   name="proposalType"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -120,7 +123,6 @@ const CreateEstimation = () => {
                 <label>Proposal For</label>
                 <TextField
                   variant="outlined"
-                  // defaultValue="Client Name"
                   name="clientName"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -129,12 +131,30 @@ const CreateEstimation = () => {
                   error={!!formik?.errors?.clientName}
                 />
               </FormControl>
+              <FormControl>
+                <label>Team Type</label>
+                <div className="team-selection">
+                  <select
+                    id="team"
+                    className="team-autocomplete"
+                    name="team"
+                    value={formik.values.team}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  >
+                    <option value="">Select</option>
+                    <option value="v-teams">Vteams</option>
+                    <option value="nxb">Nextbridge</option>
+                  </select>
+                  <img src={SelectIcon} alt="select" />
+                  {(formik.touched.team && formik?.errors.team) && <span className="error-text">{formik?.errors.team}</span>}
+                </div>
+              </FormControl>
               <FormGroup className="estimation-form-group">
                 <FormControl>
                   <label>Date</label>
                   <TextField
                     variant="outlined"
-                    // defaultValue="2023-05-24"
                     type="date"
                     name="date"
                     onChange={formik.handleChange}
@@ -148,7 +168,6 @@ const CreateEstimation = () => {
                   <label>Version</label>
                   <TextField
                     variant="outlined"
-                    // defaultValue="0.1"
                     name="version"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -158,29 +177,6 @@ const CreateEstimation = () => {
                   />
                 </FormControl>
               </FormGroup>
-              <FormControl>
-                <label>Assign Resouces</label>
-                <div className="assign-selectbox">
-                  {/* sort data */}
-                  <select
-                    id="assign"
-                    name="users"
-                    className="assign-resources-selectbox"
-                    onChange={(e) => {
-                      setOptions(e.target.value);
-                    }}
-                  >
-                    {/* <option>Please Assigned user</option> */}
-                    {selectVal.map((opts) => (
-                      <option key={opts.username}>{opts.username}</option>
-                    ))}
-                  </select>
-                  <img src={SelectIcon} alt="select" />
-                </div>
-              </FormControl>
-              {/* {options}
-            <br />
-           {selectedUser} */}
             </div>
             <div className="description">
               <FormControl>
@@ -188,19 +184,17 @@ const CreateEstimation = () => {
                 <textarea
                   name="description"
                   cols="39"
-                  rows="20"
+                  rows="16"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.description}
-                // placeholder='Type project description here This app will facilitate client who is running ISP that uses Mikrotik routers. Client will have an application for his users to provide them free internet after watching a video advertisement on same mobile application.'
                 ></textarea>
-                {(formik.touched.description && formik?.errors.description) && <span className="">{formik?.errors.description}</span>}
+                {(formik.touched.description && formik?.errors.description) && <span className="error-text">{formik?.errors.description}</span>}
               </FormControl>
             </div>
           </div>
           <Box className="estimate-btns-container">
             <Button
-              to="/dashboard"
               variant="contained"
               className="secondary-btn estimate-nav-btn"
               onClick={() => navigate(-1)}
@@ -214,17 +208,16 @@ const CreateEstimation = () => {
             >
               Next
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               type="submit"
               className="secondary-btn estimate-nav-btn"
-              onClick={sendNotification}
             >
               Send Invite
-            </Button>
+            </Button> */}
           </Box>
         </form>
-      {/* </section> */}
+      </section>
       <Footer />
     </>
   );

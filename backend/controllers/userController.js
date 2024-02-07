@@ -46,26 +46,24 @@ const authUser = (req, res) => {
   User.findOne({ username: username })
     .then((userExist) => {
       if (userExist) {
-        // console.log(userExist.password);
         bcrypt.compare(password, userExist.password)
           .then((p) => {
-            // console.log(p);
             if (p) {
               const generateToken = jwt.sign(
                 {
-                  _id: userExist._id,
+                  id: userExist._id,
                   username: userExist.username,
-                  FullName: userExist.FullName,
+                  FullName: userExist.FullName
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1d" }
+                { expiresIn: '1d' }
               );
 
-              // save token
               return res.status(200).json({
                 username: userExist.username,
                 FullName: userExist.FullName,
                 managerName: userExist.managerName,
+                id: userExist._id,
                 token: generateToken,
               });
             } else {

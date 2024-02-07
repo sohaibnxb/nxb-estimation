@@ -1,10 +1,8 @@
 import jwt, { decode } from "jsonwebtoken";
 import User from "../models/userModel.js";
-import Role from "../models/roleModal.js";
 
 const verifyToken = (req, res, next) => {
   let token = req.header("x-access-token");
-  console.log("token", token);
   if (!token) {
     return res.status(403).send({
       message: "No token provided!",

@@ -1,8 +1,5 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from 'axios';
-import { toast } from 'react-toastify';
 import Topbar from "../common/Topbar";
 import Footer from "../common/Footer";
 import ProgressBar from "../common/ProgressBar";
@@ -10,85 +7,81 @@ import {
   FormControl,
   TextField,
   Button,
-  Grid,
   Card,
 } from "@mui/material";
+import { toast } from 'react-toastify';
 import { useFormik } from "formik";
 
+
 import "./Style.scss";
+import API from "../../utils/api";
+
+const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
 
 const Costing = () => {
 
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const { project } = useSelector(state => state.timeline)
+  const { timelines, } = useSelector(state => state.timeline);
+
+  const timelinesDataForCosting = timelines?.map(timeline => ({
+    timelineId: timeline?._id,
+    projectId: timeline?.projectId,
+    timelineTitle: timeline?.timelineTitle,
+    totalHours: timeline?.totalHours,
+    hourRate: timeline?.costing?.[0]?.hourRate ?? null,
+    totalCost: timeline?.costing?.[0]?.totalCost ?? null,
+    _id: timeline?.costing?.[0]?._id ?? null
+  }));
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      hours: " ",
+      data: timelinesDataForCosting
     },
     onSubmit: async (values) => {
-      const hours = parseInt(values.hours);
-      let projName = project?.proj_name;
-      let totalcost = hours * state;
-      let payload = { projName, hours, state, totalcost };
-      const projectCostExist = await axios.get(`http://localhost:5000/api/costing/project?projectName=${projName}`)
-        .then((response) => {
-          return response.data
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      debugger
-      if (projectCostExist.length == 0) {
-        const postReq = await toast.promise(
-          axios.post(`http://localhost:5000/api/costing/?totalHours=${state}&hourRate=${hours}&totalCost=${totalcost}&projectName=${projName}`),
-          {
-            pending: 'Adding Project Costing',
-            success: 'Costing added successfully',
-            error: 'Error adding project costing'
-          }
-        )
-          .then((response) => {
-            console.log(response.data);
+      const { status, message } = checkHourlyRate(values.data);
+      if(status) {
+        try {
+          const costs = await API.post(`${backendURL}/api/costing/`, { costings: values.data })
+          if (costs) {
             navigate("/languages");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-      else {
-        debugger
-        const putReq = await toast.promise(
-          axios.put("http://localhost:5000/api/costing/id", {
-            projectName: projName,
-            totalHours: state,
-            hourRate: hours,
-            totalCost: totalcost,
-          }),
-          {
-            pending: 'Updating Project Costing',
-            success: 'Costing updated successfully',
-            error: 'Error updating project costing'
           }
-        )
-          .then((response) => {
-            navigate("/languages");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        } catch (error) {
+          console.log("error", error);
+        }
+      } else {
+        toast.error(message);
       }
     },
     validate: async (values) => {
       let errors = {};
-      if (!values.hours) {
+      if (!values.data) {
         errors.hours = "Required";
       }
       return errors;
     },
   });
 
+  const checkHourlyRate = (arr) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].hourRate === null) {
+        return { status: false, message: 'Please add hourly rate'};
+      }
+    }
+    return { status: true, message: ''};
+  }
+
+  const handleChange = (e, index) => {
+    const { value } = e.target;
+
+    const updatedData = [...formik.values.data];
+    updatedData[index] = { ...updatedData[index], hourRate: value };
+    updatedData[index] = { ...updatedData[index], totalCost: (value * updatedData[index].totalHours) };
+    formik.setValues({ ...formik.values, data: updatedData });
+  }
+
+
+  let totalCost = formik.values.data.reduce((total, item) => (total + (item.hourRate * item.totalHours)), 0)
   return (
     <>
       <Topbar estimate={false} limiteRole={false} />
@@ -97,7 +90,7 @@ const Costing = () => {
         <Card className="costing-card">
           <h5 className="costing-sub-title">TOTAL COST OF YOUR PROJECT</h5>
           <h2 className="costing-title">
-            <span>$</span> {formik.values.hours * state}
+            <span>$</span>{totalCost}
           </h2>
 
           <table className="costing-table">
@@ -107,33 +100,39 @@ const Costing = () => {
               <th>Hour</th>
               <th className="br-0">Cost</th>
             </tr>
-            <tr>
-              <td>{project?.proj_name}</td>
-              <td>
-                <FormControl>
-                  <TextField
-                    variant="outlined"
-                    placeholder="0"
-                    name="hours"
-                    onChange={formik.handleChange}
-                    value={formik.values.hours}
-                  />
-                </FormControl>
-                / hours
-              </td>
-              <td> {state}</td>
-              <td>$ {formik.values.hours * state}</td>
-            </tr>
+
+            {
+              timelinesDataForCosting?.map((timeline, index) => (
+                <tr key={index}>
+                  <td>{timeline?.timelineTitle}</td>
+                  <td>
+                    <FormControl>
+                      <TextField
+                        variant="outlined"
+                        placeholder="0"
+                        name={`${formik.values.data[index].title}`}
+                        onChange={(e) => handleChange(e, index)}
+                        defaultValue={formik.values.data[index].hourRate}
+                        type="number"
+                        inputProps={{ min: 0 }}
+                      />
+                    </FormControl>
+                    / hours
+                  </td>
+                  <td>{timeline?.totalHours}</td>
+                  <td>{formik.values.data[index].totalCost}</td>
+                </tr>
+              ))
+            }
             <tr>
               <td colSpan={3} className="text-right text-bold">
                 Total
               </td>
-              <td className="text-bold">$ {formik.values.hours * state}</td>
+              <td className="text-bold">${totalCost}</td>
             </tr>
           </table>
-
         </Card>
-        <div container className="estimate-btns-container">
+        <div className="estimate-btns-container">
           <Button
             variant="contained"
             className="secondary-btn estimate-nav-btn"

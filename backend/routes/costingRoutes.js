@@ -1,11 +1,12 @@
 import express from "express";
-import { getCosting, getCostingByProject, postCosting, updateCosting } from "../controllers/costingController.js";
+import { getCosting, getCostingByProject,getCostingByTimeline, postCosting, updateCosting } from "../controllers/costingController.js";
 
 const router = express.Router();
 
 router.post("/", postCosting);
 router.get("/", getCosting);
 router.get("/project", getCostingByProject);
-router.put("/id", updateCosting);
+router.get("/timeline", getCostingByTimeline);
+router.put("/", updateCosting);
 
 export default router;

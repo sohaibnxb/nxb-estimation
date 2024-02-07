@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import jwt from 'jwt-decode'
+import { useState, useEffect } from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from "@mui/material";
 
-import { getRole, getNotifications, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects } from "../../redux/dashboardActions";
+import { getRole, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects, getAllProjects } from "../../redux/dashboardActions";
 
 import SearchIcon from "../../../../assets/images/search.svg";
 import SelectIcon from "../../../../assets/images/select.svg";
@@ -13,24 +12,35 @@ import SelectIcon from "../../../../assets/images/select.svg";
 const EstimatesHistory = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inputSearch, setInputSearch] = useState("");
+  const { projects, role, loading } = useSelector(state => state.dashboard)
+  const { userInfo } = useSelector(state => state.auth)
+  const { username, FullName, id } = userInfo;
+  const [userProjects, setUserProjects] = useState([]);
 
-  const userToken = localStorage.getItem("access-token")
-  const { projects, notifications, role, loading } = useSelector(state => state.dashboard)
+  const dispatch = useDispatch();
 
-  const { username, FullName } = jwt(userToken);
-
-  const dispatch = useDispatch()
+  useEffect(() => {
+    setUserProjects(projects);
+  }, [projects]);
 
   const handleSelected = async (event) => {
     var selectedVal = event.target.value;
+    if (selectedVal === "") {
+      setUserProjects(projects)
+    }
     if (selectedVal === "Vteams") {
-      dispatch(getVteamsProjects())
+      const vteamsProjects = projects.filter(project => project.team === "v-teams")
+      setUserProjects(vteamsProjects)
     }
     else if (selectedVal === "Nextbridge") {
-      dispatch(getNxbProjects())
+      const nxbProjects = projects.filter(project => project.team === "nxb")
+      setUserProjects(nxbProjects)
     }
     else if (selectedVal === "RecentlyAdded") {
-      dispatch(getRecentProjects(FullName))
+      const recentProjects = [...projects].sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      setUserProjects(recentProjects)
     } else {
       console.log("no data");
     }
@@ -43,24 +53,28 @@ const EstimatesHistory = () => {
   // Projects Search
   useEffect(() => {
     if (inputSearch === '') {
-      setSearchResults(projects);
+      setSearchResults(userProjects);
     }
     else {
-      const results = projects.filter((item) =>
+      const results = userProjects.filter((item) =>
         item.proj_name.toLowerCase().includes(inputSearch.toLowerCase())
       );
       setSearchResults(results);
     }
-  }, [inputSearch, projects]);
+  }, [inputSearch, userProjects]);
 
   useEffect(() => {
 
     const fetchData = () => {
       if (role === 'manager') {
-        dispatch(getProjectsByManager(FullName))
+        dispatch(getProjectsByManager({ FullName, id }));
       }
       else if (role === 'resource') {
-        dispatch(getProjectsByResource(username))
+        const userData = { FullName, id };
+        dispatch(getProjectsByResource(userData));
+      }
+      else if (role === "admin") {
+        dispatch(getAllProjects(role));
       }
       else {
         console.log("No Projects Found");
@@ -68,12 +82,12 @@ const EstimatesHistory = () => {
     }
 
     fetchData()
-  }, [role, username, FullName, dispatch]);
+  }, [role, username, FullName, dispatch, id]);
 
 
   useEffect(() => {
     dispatch(getRole(username))
-    dispatch(getNotifications(username))
+    // dispatch(getNotifications(username))
   }, [])
 
   return (
@@ -104,7 +118,7 @@ const EstimatesHistory = () => {
                 onChange={handleSelected}
                 className="sort-autocomplete"
               >
-                <option value="DEFAULT">Sort By:</option>
+                <option value="">Sort By:</option>
                 <option value="Vteams">Vteams</option>
                 <option value="Nextbridge">Nextbridge</option>
                 <option value="RecentlyAdded">Recently Added</option>
@@ -113,13 +127,12 @@ const EstimatesHistory = () => {
             </div>
           </div>
         </div>
-
         {loading ? (
           <div className="circular-progress">
             <CircularProgress />
           </div>
         ) : (
-          searchResults.map((project, index) => (
+          searchResults?.map((project) => (
             <div className="nb-estimatesHistory-content" key={project._id}>
               <div className="calender-wrapper">
                 <div className="date-box">
@@ -133,7 +146,7 @@ const EstimatesHistory = () => {
               <div className="project-meta">
                 <span>PROPOSAL FOR</span>
                 <h5>
-                  <Link to={`/timeline/${project._id}`}>
+                  <Link to={`/timeline/${project._id}`} >
                     {project?.proj_name}
                   </Link>
                 </h5>

@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom"
-import { useDispatch, useSelector } from 'react-redux';
-import jwt from "jwt-decode"
+import { useSelector } from 'react-redux';
 import { Button, Tooltip, IconButton, Avatar, Typography, Menu, MenuItem } from '@mui/material'
-// images
-import Notifi from "../../../assets/images/notifi.png";
+import { toast } from 'react-toastify';
 
 const Topbar = ({ estimate = false }) => {
   const [showEstimate, setShowEstimate] = useState(estimate);
@@ -19,31 +17,29 @@ const Topbar = ({ estimate = false }) => {
     setAnchorEl(null);
   };
 
-  const userToken = localStorage.getItem('access-token');
   const { role } = useSelector(state => state.dashboard)
-  const { username, FullName } = jwt(userToken);
-
-
+  const { userInfo } = useSelector(state => state.auth)
 
   const removeToken = () => {
-    localStorage.removeItem("access-token");
-    // localStorage.removeItem("user");
-    // localStorage.removeItem("roleName");
-    // localStorage.removeItem("username");
-    navigate("/");
+    localStorage.removeItem('access-token')
+    navigate("/signin");
+    toast.success("Logout successfully")
   };
   // getting initials
-  let getInitials = function (string) {
-    let names = string?.split(' '),
+  let getInitials = function (name) {
+    let names = name?.split(' ');
+    let initials = '';
+    if(names) {
       initials = names[0]?.substring(0, 1)?.toUpperCase();
 
-    if (names.length > 1) {
-      initials += names[names.length - 1].substring(0, 1).toUpperCase();
+      if (names.length > 1) {
+        initials += names[names.length - 1].substring(0, 1).toUpperCase();
+      }
     }
     return initials;
   };
+  let profileName = getInitials(userInfo?.FullName);
 
-  let profileName = getInitials(FullName);
 
   useEffect(() => {
     if (role == 'resource') {
@@ -51,7 +47,7 @@ const Topbar = ({ estimate = false }) => {
     } else {
       setLimitRole(true);
     }
-  }, [])
+  }, [role])
 
   return (
     <>
@@ -63,7 +59,7 @@ const Topbar = ({ estimate = false }) => {
               <span>SOFTWARE</span>
             </h2>
           </div>
-          {showEstimate && limitRole ?
+          {showEstimate && limitRole && (role === "manager" || role === "admin") ?
             (
               <div className='nb-create-est-btn'>
                 <Button className='light-btn new-est-btn'>

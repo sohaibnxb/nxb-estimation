@@ -5,10 +5,10 @@
 .progress-bar{
     display: flex;
     position: sticky;
-    top: calculateRem(80px);
+    top: calculateRem(81px);
     .step {
         background-color: map-get($base_colors, 'status-bar-color');
-        height: 10px;
+        height: 8px;
         flex: 1;
         &:not(:last-child){
             margin-right: 2px;

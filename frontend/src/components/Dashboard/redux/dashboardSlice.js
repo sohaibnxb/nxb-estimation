@@ -1,6 +1,5 @@
-import axios from 'axios'
 import { createSlice } from '@reduxjs/toolkit'
-import { getRole, getNotifications, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects } from './dashboardActions'
+import { getRole, getNotifications, getProjectsByManager, getProjectsByResource, getVteamsProjects, getNxbProjects, getRecentProjects, getAllProjects } from './dashboardActions'
 
 
 const initialState = {
@@ -17,15 +16,12 @@ const dashboardSlice = createSlice({
     extraReducers: builder => {
         // Get Role 
         builder.addCase(getRole.pending, state => {
-            // state.loading = true
             state.error = null
         })
             .addCase(getRole.fulfilled, (state, action) => {
-                // state.loading = false
                 state.role = action.payload
             })
             .addCase(getRole.rejected, (state, action) => {
-                // state.loading = false
                 state.error = action.payload
             })
 
@@ -53,6 +49,20 @@ const dashboardSlice = createSlice({
                 state.projects = action.payload
             })
             .addCase(getProjectsByManager.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+
+            // Get all projects for admin
+            .addCase(getAllProjects.pending, state => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(getAllProjects.fulfilled, (state, action) => {
+                state.loading = false
+                state.projects = action.payload
+            })
+            .addCase(getAllProjects.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
             })

@@ -1,26 +1,24 @@
-import React from "react";
 import {
-  Box,
-  Grid,
   FormControl,
   TextField,
   Button,
-  textFieldClasses,
 } from "@mui/material";
+
+
+import closeIcon from "../../../assets/images/close.svg"
+import addIcon from "../../../assets/images/add.svg"
 const TableRows = ({
   rowsData,
-  rowsExtraData,
   deleteTableRows,
   handleChange,
   addSubRows,
-  showExtraRow,
   handleExtraChange,
   deleteTableExtraRows,
   addTableRows
 }) => {
-  return rowsData?.map((data, index) => {
-    const { screenName, hours, screenSections } = data;
 
+  return rowsData?.map((data, index) => {
+    const { itemName, hours, subItems } = data;
     return (
       <tr key={index}>
         <td>
@@ -28,26 +26,34 @@ const TableRows = ({
           <FormControl>
             <TextField
               variant="standard"
-              name="screenName"
+              name="itemName"
               placeholder="App Icon"
               onChange={(evnt) => handleChange(index, evnt)}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   addTableRows()
+                  e.preventDefault();
                 }
               }}
-              value={screenName}
+              value={itemName}
             />
           </FormControl>
+          {/* <Button
+            className="secondary-button add-subRow"
+            onClick={() => deleteTableRows(index)}
+            style={{marginRight: '30px'}}
+          >
+            <img src={closeIcon} alt="add" width={8} />
+          </Button> */}
           <Button
             className="secondary-button add-subRow"
             onClick={() => addSubRows(index)}
           >
-            +
+            <img src={addIcon} alt="add" width={10} />
           </Button>
-          {screenSections.length > 0
-            ? screenSections.map((elem, subIndex) => {
-              //const { screenSections } = elem;
+          {subItems?.length > 0
+            ? subItems.map((elem, subIndex) => {
+              //const { subItems } = elem;
               return (
                 <>
                   <td className="subRowInput">
@@ -56,28 +62,35 @@ const TableRows = ({
                       className="secondary-button add-subRow"
                       onClick={() => addSubRows(index, subIndex)}
                     >
-                      +
+                      <img src={addIcon} alt="add" width={10} />
                     </Button>
                     <FormControl key={elem.subIndex}>
                       <TextField
                         type="text"
                         key={subIndex}
                         variant="standard"
-                        name="screenSections"
+                        name="subItems"
                         placeholder="Login Screen"
                         onChange={(evnt) => handleExtraChange(index, subIndex, evnt)}
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             addSubRows(index, subIndex)
+                            e.preventDefault()
                           }
                         }}
                         value={elem}
                       />
                     </FormControl>
+                    {/* <span
+                      className="subdata"
+                      onClick={() => deleteTableExtraRows(index, subIndex)}
+                    ></span> */}
                     <span
                       className="subdata"
                       onClick={() => deleteTableExtraRows(index, subIndex)}
-                    ></span>
+                    >
+                      <img src={closeIcon} alt="add" width={8} />
+                    </span>
                   </td>
                 </>
               );
@@ -94,6 +107,11 @@ const TableRows = ({
               placeholder="2"
 
               onChange={(evnt) => handleChange(index, evnt)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                }
+              }}
               value={hours}
             />
           </FormControl>
@@ -102,28 +120,14 @@ const TableRows = ({
         <td>
           <Button
             className="secondary-button  timeline-action-btn"
-            onClick={(e) => deleteTableRows(index)}
+            onClick={() => deleteTableRows(index)}
           >
-            x
+            <img src={closeIcon} alt="close" width={8} />
           </Button>
-          <Button
-            className="secondary-button timeline-action-btn"
-            onClick={() => addTableRows()}
-          >
-            +
-          </Button>
-
-          {/* <span
-              className="data"
-              onClick={(e) => deleteTableRows(index)}
-            ></span> */}
         </td>
       </tr>
     )
   });
 };
-{/* <tr className="totalRow">
-          <td>Total</td>
-          <td>{totalhours}</td>
-        </tr> */}
+
 export default TableRows;

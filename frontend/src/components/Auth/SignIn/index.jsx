@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux'
+import { Navigate } from "react-router-dom";
+import { useDispatch, useSelector, } from 'react-redux'
 import { userLogin } from "./redux/authActions";
 import { useFormik } from "formik";
 import {
@@ -16,28 +15,20 @@ import "./Style.scss";
 // images
 import illustration from "../../../assets/images/side-img.png";
 import Logo from "../../../assets/images/nxb-logo.png";
+import { setIsNavigatingToSignIn } from "../../../utils/api";
 
 const SignIn = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch()
   const userToken = localStorage.getItem("access-token")
-  const { loading, userInfo, error } = useSelector((state) => state.auth)
+  const { userInfo } = useSelector(state => state.auth)
+
   const initialValues = {
     username: "",
     password: "",
   };
 
-  useEffect(() => {
-    if (userInfo && userToken) {
-      navigate('/dashboard')
-    }
-  }, [])
 
-  useEffect(() => {
-    if (userInfo && userToken) {
-      navigate('/dashboard')
-    }
-  }, [navigate, userInfo, userToken])
+  setIsNavigatingToSignIn(false);
 
   const onSubmit = async (values) => {
     dispatch(userLogin(values))
@@ -63,6 +54,10 @@ const SignIn = () => {
     onSubmit,
     validate,
   });
+
+  if (userToken && userInfo) {
+    return <Navigate to="/" />
+  }
 
   return (
     <>
@@ -98,9 +93,11 @@ const SignIn = () => {
                       variant="outlined"
                       name="username"
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       value={formik.values.username}
                     />
-                    {formik.errors.username ? (
+
+                    {formik.touched.username && formik.errors.username ? (
                       <Typography variant="subtitle2">
                         {formik.errors.username}
                       </Typography>
@@ -113,9 +110,10 @@ const SignIn = () => {
                       type="password"
                       name="password"
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       value={formik.values.password}
                     />
-                    {formik.errors.password ? (
+                    {formik.touched.password && formik.errors.password ? (
                       <Typography variant="subtitle2">
                         {formik.errors.password}
                       </Typography>
