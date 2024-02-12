@@ -40,8 +40,8 @@ export default function InviteUserModal({ open, toggleOpen, timelineId }) {
             'x-access-token': localStorage.getItem("access-token"),
         }
       });
-      setUsers(users.data);
-      console.log("USERS: ", users.data);
+      let filterdUsers = users.data.filter((user) => user.FullName !== FullName);
+      setUsers(filterdUsers);
     }
     getUsers();
   }, []);

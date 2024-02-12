@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import Mailgen from "mailgen";
 
 export const sendInviteEmail = async (req, res) => {
-    const { email, project, name } = req.body;
+    const { email, project, name, senderName } = req.body;
     
     let config = {
         service: 'gmail',
@@ -26,7 +26,7 @@ export const sendInviteEmail = async (req, res) => {
     let response = {
         body: {
             name: name,
-            intro: 'Welcome to NXB Estimation App! We\'re very excited to have you on board.',
+            intro: `${senderName} invited you to the project ${project}`,
             action: {
                 instructions: 'To get started with NXB Estimation, please click here:',
                 button: {

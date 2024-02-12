@@ -12,7 +12,7 @@ import { addTimeline, deleteTimeline } from "../redux/timelineSllice";
 import InviteUserModal from "../../common/InviteUserModal";
 import API from "../../../utils/api";
 
-const backendURL = import.meta.env.VITE_REACT_APP_BASE_URL || "http://localhost:5000";
+const backendURL = 'http://10.28.81.105:5000' || "http://localhost:5000";
 
 const Timelinecontent = () => {
   const [estimatedMode, setEstimatedMode] = useState(["Hours", "Days"]);
@@ -38,25 +38,10 @@ const Timelinecontent = () => {
   // Hanle Estimate Type
   const handleOptionChange = (e) => {
     var selectedOption = estimatedMode[e.target.value];
-    console.log("selectedOption", selectedOption);
     if (selectedOption === "Hours") {
       console.log(selectedOption);
     }
   };
-
-  // useEffect(() => {
-  //   const projectId = project._id;
-  //   getTimelines(projectId);
-  // }, [timelines]);
-
-  // function navigatePage() {
-  //   if (rowsData !== "") {
-  //     return navigate("/costing", { state: totalHours });
-
-  //   } else {
-  //     alert("please fill the estimate");
-  //   }
-  // }
 
   function navigatePageD() {
     let { status, message } = validateTimelines(timelines);
@@ -72,9 +57,8 @@ const Timelinecontent = () => {
   async function handleTimelinesSubmit(isNavigate) {
     let { status, message } = validateTimelines(timelines);
     if (status) {
-      console.log("TIMELINES: ", timelines);
       dispatch(submitTimelines(timelines)).then((res) => {
-        if (isNavigate) {
+        if(isNavigate) {
           navigate('/costing');
         }
       });
@@ -86,36 +70,36 @@ const Timelinecontent = () => {
   // to validate timeline form
   const validateTimelines = (timelineData) => {
     for (const timeline of timelineData) {
-      if (!timeline.timelineTitle) {
-        return { status: false, message: 'Please add timeline title' };
-      }
-
-      if (role === "manager" || role === "admin") {
-        if (!timeline.items || timeline.items.length === 0) {
-          return { status: true, message: '' };
-        }
-      } else if (role === "resource") {
-        if (!timeline.items || timeline.items.length === 0) {
-          return { status: false, message: 'Please add items in the timeline' };
-        }
-      }
-
-      for (const item of timeline.items) {
-        if (!item.itemName) {
-          return { status: false, message: 'Please add timeline item name' };
-        }
-        if (!item.hours) {
-          return { status: false, message: 'Please add estimation hours' };
+        if (!timeline.timelineTitle) {
+            return { status: false, message: 'Please add timeline title' };
         }
 
-        if (item.subItems && item.subItems.length > 0) {
-          for (const subItem of item.subItems) {
-            if (!subItem.trim()) {
-              return { status: false, message: 'Please add valid subItem name' };
+        if (role === "manager" || role === "admin") {
+            if (!timeline.items || timeline.items.length === 0) {
+                return { status: true, message: '' };
             }
-          }
+        } else if (role === "resource") {
+            if (!timeline.items || timeline.items.length === 0) {
+                return { status: false, message: 'Please add items in the timeline' };
+            }
         }
-      }
+
+        for (const item of timeline.items) {
+            if (!item.itemName) {
+                return { status: false, message: 'Please add timeline item name' };
+            }
+            if (!item.hours) {
+                return { status: false, message: 'Please add estimation hours' };
+            }
+
+            if (item.subItems && item.subItems.length > 0) {
+                for (const subItem of item.subItems) {
+                    if (!subItem.trim()) {
+                        return { status: false, message: 'Please add valid subItem name' };
+                    }
+                }
+            }
+        }
     }
     return { status: true, message: '' };
   };
@@ -213,63 +197,63 @@ const Timelinecontent = () => {
                     ))}
 
                   </ul>
+                  {
+                    projectOwner === FullName &&
+                    <div className="add-button"
+                      // onClick={() => setTimelineTables(prev => {+++
+                      //   return [...prev, <TimelineTable />]
+                      // })}
+                      onClick={handleAddTimeline}
+                    >
+                      <svg
+                        id="Component_21_4"
+                        data-name="Component 21 – 4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="60"
+                        height="60"
+                        viewBox="0 0 60 60"
+                      >
+                        <path
+                          id="Rectangle_305"
+                          data-name="Rectangle 305"
+                          d="M0,0H60a0,0,0,0,1,0,0V60a0,0,0,0,1,0,0H8a8,8,0,0,1-8-8V0A0,0,0,0,1,0,0Z"
+                          fill="currentColor"
+                        />
+                        <path
+                          id="Path_23"
+                          data-name="Path 23"
+                          d="M0,0H60V60Z"
+                          fill="#fff"
+                        />
+                        <g
+                          id="Group_322"
+                          data-name="Group 322"
+                          transform="translate(-1751.5 -684.5)"
+                        >
+                          <line
+                            id="Line_161"
+                            data-name="Line 161"
+                            x2="16"
+                            transform="translate(1761.5 726.5)"
+                            fill="none"
+                            stroke="#fff"
+                            strokeWidth="2.5"
+                          />
+                          <line
+                            id="Line_162"
+                            data-name="Line 162"
+                            y2="16"
+                            transform="translate(1769.5 718.5)"
+                            fill="none"
+                            stroke="#fff"
+                            strokeWidth="2.5"
+                          />
+                        </g>
+                      </svg>
+                    </div>
+                  }
                 </CardContent>
               </Card>
-              {
-                projectOwner === FullName &&
-                <div className="add-button"
-                  // onClick={() => setTimelineTables(prev => {+++
-                  //   return [...prev, <TimelineTable />]
-                  // })}
-                  onClick={handleAddTimeline}
-                >
-                  <svg
-                    id="Component_21_4"
-                    data-name="Component 21 – 4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="60"
-                    height="60"
-                    viewBox="0 0 60 60"
-                  >
-                    <path
-                      id="Rectangle_305"
-                      data-name="Rectangle 305"
-                      d="M0,0H60a0,0,0,0,1,0,0V60a0,0,0,0,1,0,0H8a8,8,0,0,1-8-8V0A0,0,0,0,1,0,0Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      id="Path_23"
-                      data-name="Path 23"
-                      d="M0,0H60V60Z"
-                      fill="#fff"
-                    />
-                    <g
-                      id="Group_322"
-                      data-name="Group 322"
-                      transform="translate(-1751.5 -684.5)"
-                    >
-                      <line
-                        id="Line_161"
-                        data-name="Line 161"
-                        x2="16"
-                        transform="translate(1761.5 726.5)"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.5"
-                      />
-                      <line
-                        id="Line_162"
-                        data-name="Line 162"
-                        y2="16"
-                        transform="translate(1769.5 718.5)"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.5"
-                      />
-                    </g>
-                  </svg>
-                </div>
-              }
             </div>
           </div>
           <div className="estimate-btns-container">
@@ -337,13 +321,20 @@ const ConfirmationDialog = ({ open, onClose, onDelete, id }) => {
 
   const handleDelete = async () => {
     try {
-      await API.delete(`${backendURL}/api/timelines/${id}`);
+      const deleteResponse = await API.delete(`${backendURL}/api/timelines/${id}`);
+      if(deleteResponse.status === 204) {
+        toast.warning("Please save the timeline first");
+        onClose();
+        return;
+      }
       onDelete();
+      toast.success("Deleted successfully");
       onClose();
     } catch (error) {
       console.error(error);
     }
   };
+  
   return (
     <Dialog
       open={open}

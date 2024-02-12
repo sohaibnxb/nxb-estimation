@@ -37,8 +37,6 @@
       .card-padding {
         padding-bottom: 75px;
         box-shadow: none;
-        overflow-y: auto;
-        height: 100%;
 
         .expertise {
           padding-left: 0;
@@ -107,17 +105,17 @@
             }
           }
         }
-      }
 
-      .add-button {
-        color: map-get($page_bg, "gd1");
-        cursor: pointer;
-        position: absolute;
-        bottom: -6px;
-        left: 0;
+        .add-button {
+          color: map-get($page_bg, "gd1");
 
-        &:hover {
-          color: map-get($base_colors, "tertiary-color");
+          position: absolute;
+          bottom: -6px;
+          left: 0;
+
+          &:hover {
+            color: map-get($base_colors, "tertiary-color");
+          }
         }
       }
     }

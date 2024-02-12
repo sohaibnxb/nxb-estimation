@@ -55,8 +55,10 @@ const Topbar = ({ estimate = false }) => {
         <div className="nb-right-container">
           <div className='nb-logo'>
             <h2>
-              ESTIMATION
-              <span>SOFTWARE</span>
+              <Link to="/">
+                ESTIMATION
+                <span>SOFTWARE</span>
+              </Link>
             </h2>
           </div>
           {showEstimate && limitRole && (role === "manager" || role === "admin") ?
@@ -68,7 +70,6 @@ const Topbar = ({ estimate = false }) => {
               </div>
             ) : ' '
           }
-
         </div>
         <div className="nb-left-container">
           <Tooltip title="Profile">
@@ -127,7 +128,7 @@ const Topbar = ({ estimate = false }) => {
         </div>
       </header>
     </>
-  )
+  );
 }
 
-export default Topbar 
+export default Topbar;
